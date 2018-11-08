@@ -2,9 +2,13 @@ package com.burns.android.ancssample;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 import com.burns.android.ancssample.R;
+import com.tbruyelle.rxpermissions2.RxPermissions;
 
+import android.graphics.Color;
 import android.text.TextUtils;
 import android.util.Log;
 import android.app.ListActivity;
@@ -59,6 +63,10 @@ public class MainActivity extends ListActivity {
 				name = dev.getAddress();
 			}
 			tv.setText(name);
+
+			if (dev.getBondState() == BluetoothDevice.BOND_BONDED) {
+				tv.setTextColor(Color.BLUE);
+			}
 			return tv;
 		}
 
@@ -95,8 +103,7 @@ public class MainActivity extends ListActivity {
 						}
 					}
 					if (!found) {
-						mList.add(device);
-						mListAdapter.notifyDataSetChanged();
+						add(device);
 					}
 				}
 			});
@@ -108,19 +115,25 @@ public class MainActivity extends ListActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_devices);
-		mScanButton = (Button)findViewById(R.id.scan);
+		mScanButton = (Button) findViewById(R.id.scan);
 		mAutoCB = (CheckBox) findViewById(R.id.autoconnect);
 		mScanButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				if(!mLEscaning){
+				if (!mLEscaning) {
 					mList.clear();
 					scan(true);
-				}else{
+				} else {
 					scan(false);
 				}
 			}
 		});
+
+		getListView().setAdapter(mListAdapter);
+		initBluetooth();
+	}
+
+	private void initBluetooth() {
 		PackageManager pm = getPackageManager();
 		boolean support = pm.hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE);
 		if (!support) {
@@ -153,22 +166,38 @@ public class MainActivity extends ListActivity {
 		}
 		*/
 		//scan(true);
-		getListView().setAdapter(mListAdapter);
 		//stop automatic scan , I try to list my iphone by mac address
 		//connect is success, but status is 133, keep the code temp.
 		BluetoothDevice device = BluetoothAdapter.getDefaultAdapter().getRemoteDevice("E8:8D:28:E0:AC:51");
+		add(device);
+	}
+
+	private void add(BluetoothDevice device) {
 		mList.add(device);
 		mListAdapter.notifyDataSetChanged();
 	}
 
-	
+
 	void scan(final boolean enable) {
 		if (enable) {
 			// Stops scanning after a pre-defined scan period.
 			Log.i(TAG,"start to scan.");
 			mLEscaning = true;
-			mBluetoothAdapter.startLeScan(mLEScanCallback);
+			mBluetoothAdapter.startLeScan(new UUID[]{
+						GattConstant.Apple.sUUIDANCService,
+						GattConstant.Apple.sUUIDChaNotify,
+						GattConstant.Apple.sUUIDControl,
+						GattConstant.Apple.sUUIDDataSource,
+						GattConstant.DESCRIPTOR_UUID
+					},
+					mLEScanCallback
+			);
 			mScanButton.setText(R.string.stop_scan);
+
+			Set<BluetoothDevice> bondedDevices = mBluetoothAdapter.getBondedDevices();
+			for (BluetoothDevice bondedDevice : bondedDevices) {
+				add(bondedDevice);
+			}
 		} else {
 			if (mLEscaning) {
 				mBluetoothAdapter.stopLeScan(mLEScanCallback);
@@ -204,6 +233,11 @@ public class MainActivity extends ListActivity {
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		BluetoothDevice dev = mList.get(position);
 		scan(false);
+		mScanButton.postDelayed(() -> connectToDevice(dev), 300);
+
+	}
+
+	private void connectToDevice(BluetoothDevice dev) {
 		Intent intent = new Intent(this,  BLEConnect.class);
 		intent.putExtra("addr", dev.getAddress());
 		intent.putExtra("auto", mAutoCB.isChecked());

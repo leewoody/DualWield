@@ -11,4 +11,5 @@
     <string name="bt_off_msg">Bluetooth had been closed.</string>
     <string name="exit_service">exit service</string>
     <string name="connect_notice">Connecting...</string>
+    <string name="error_permissions">You must grant permissions</string>
 </resources>

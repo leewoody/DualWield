@@ -135,7 +135,7 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification
 		this.addr = addr;
 		BluetoothDevice dev = BluetoothAdapter.getDefaultAdapter().getRemoteDevice(addr);
 		mANCSHandler.listenIOSNotification(this);
-		mBluetoothGatt = dev.connectGatt(this, auto, mANCScb);
+		mBluetoothGatt = dev.connectGatt(this, auto, mANCScb, BluetoothDevice.TRANSPORT_LE);
 		mANCScb.setBluetoothGatt(mBluetoothGatt);
 		mANCScb.setStateStart();
 	}
