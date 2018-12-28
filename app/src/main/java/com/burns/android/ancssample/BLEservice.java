@@ -24,6 +24,10 @@ import android.os.Message;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
+
 public class BLEservice extends Service implements ANCSParser.onIOSNotification
 		, ANCSGattCallback.StateListener{
 	private static final String TAG="BLEservice";
@@ -36,6 +40,7 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification
 	boolean mAuto;
 	String addr;
 	int mBleANCS_state = 0;
+    private final List<String> notificationChannels = new ArrayList<>();
 
     public class MyBinder extends Binder {
     	BLEservice getService() {
@@ -125,9 +130,13 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification
 	}
 
     private String getChannel(IOSNotification noti) {
-        // TODO: make a channel per iPhone app id, cache them.
+        // TODO: make a channel per iPhone app id.
         String channelId = "allappspackage";
-        createNotificationChannel(channelId, "All Apps");
+
+        if (!notificationChannels.contains(channelId)) {
+            createNotificationChannel(channelId, "All Apps");
+            notificationChannels.add(channelId);
+        }
         return channelId;
     }
 
