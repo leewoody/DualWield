@@ -5,6 +5,7 @@ import com.burns.android.ancssample.ANCSGattCallback.StateListener;
 import com.burns.android.ancssample.R;
 
 import android.annotation.SuppressLint;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
@@ -16,6 +17,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences.Editor;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -26,13 +28,15 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification
 		, ANCSGattCallback.StateListener{
 	private static final String TAG="BLEservice";
 	private final IBinder mBinder = new MyBinder();
-	private ANCSParser mANCSHandler;
+    private NotificationManager notificationManager;
+    private ANCSParser mANCSHandler;
 	private ANCSGattCallback mANCScb;
 	BluetoothGatt mBluetoothGatt;
 	BroadcastReceiver mBtOnOffReceiver;
 	boolean mAuto;
 	String addr;
 	int mBleANCS_state = 0;
+
     public class MyBinder extends Binder {
     	BLEservice getService() {
             // Return this instance  so clients can call public methods
@@ -62,6 +66,8 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification
 	public void onCreate() {
 		super.onCreate();
 		Log.i(TAG, "onCreate");
+        notificationManager = ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE));
+
 		mANCSHandler = ANCSParser.getDefault(this);
 		mANCScb = new ANCSGattCallback(this, mANCSHandler);
 		mBtOnOffReceiver = new BroadcastReceiver() {
@@ -111,17 +117,38 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification
 	//** when ios notification changed
 	@Override
 	public void onIOSNotificationAdd(IOSNotification noti) {
-		NotificationCompat.Builder build = new
-		NotificationCompat.Builder(this)
-		.setSmallIcon(R.drawable.ic_launcher)
-		.setContentTitle(noti.title)
-		.setContentText(noti.message);		
-		((NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE)).notify(noti.uid, build.build());
+		NotificationCompat.Builder build = new NotificationCompat.Builder(this, getChannel(noti))
+            .setSmallIcon(R.drawable.ic_launcher)
+            .setContentTitle(noti.title)
+            .setContentText(noti.message);
+		notificationManager.notify(noti.uid, build.build());
 	}
 
-	@Override
+    private String getChannel(IOSNotification noti) {
+        // TODO: make a channel per iPhone app id, cache them.
+        String channelId = "allappspackage";
+        createNotificationChannel(channelId, "All Apps");
+        return channelId;
+    }
+
+    private void createNotificationChannel(String channelId, String name) {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            String description = getString(R.string.channel_description, name);
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(channelId, name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+
+    @Override
 	public void onIOSNotificationRemove(int uid) {
-		((NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE)).cancel(uid);
+		notificationManager.cancel(uid);
 	}
 	
 	//** public method , for client to call
