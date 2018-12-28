@@ -189,6 +189,7 @@ public class ANCSParser {
 			final byte[] data = bout.toByteArray();
 			logD(data);
 			if (data.length < 5) {
+				Log.i(TAG,"data length less than 5: " + data.length);
 				return; // 
 			}
 			// check if finished ?
@@ -213,6 +214,7 @@ public class ANCSParser {
 					break; 
 				}
 				if (data.length < curIdx + 3) {
+					Log.i(TAG,"data length done: " + data.length);
 					return;
 				}
 				// attributes head
@@ -220,9 +222,11 @@ public class ANCSParser {
 				int attrLen = ((data[curIdx + 1])&0xFF) | (0xFF&(data[curIdx + 2] << 8));
 				curIdx += 3;
 				if (data.length < curIdx + attrLen) {
+					Log.i(TAG,"data length attribute too short: " + data.length + " < " + curIdx + attrLen);
 					return;
 				}
 				String val = new String(data, curIdx, attrLen);//utf-8 encode
+				Log.i(TAG,"got attribute: " + val);
 				if (attrId == NotificationAttributeIDTitle) { 
 					noti.title = val;
 				} else if (attrId == NotificationAttributeIDMessage) {
@@ -243,7 +247,7 @@ public class ANCSParser {
 			Log.i(TAG,"noti.messageSize:"+noti.messageSize);
 			Log.i(TAG,"got a notification! data size = "+data.length);
 			mCurData = null;
-//			mHandler.sendEmptyMessage(MSG_DO_NOTIFICATION); // continue next!
+			mHandler.sendEmptyMessage(MSG_DO_NOTIFICATION); // continue next!
 			sendNotification(noti);
 		}
 	}
