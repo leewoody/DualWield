@@ -20,6 +20,13 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/scan" />
+        <Switch
+            android:id="@+id/broadcast"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="false"
+            android:text="@string/broadcast" />
 
         <CheckBox
             android:id="@+id/autoconnect"

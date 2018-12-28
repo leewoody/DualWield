@@ -29,7 +29,9 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ListView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.os.Build;
@@ -110,12 +112,16 @@ public class MainActivity extends ListActivity {
 
 		}
 	};
-	
+    private MidiGattServer midiServer;
+	private Switch broadcastButton;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_devices);
 		mScanButton = (Button) findViewById(R.id.scan);
+		broadcastButton = findViewById(R.id.broadcast);
+		broadcastButton.setOnCheckedChangeListener(this::startBroadcasting);
 		mAutoCB = (CheckBox) findViewById(R.id.autoconnect);
 		mScanButton.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -133,7 +139,16 @@ public class MainActivity extends ListActivity {
 		initBluetooth();
 	}
 
-	private void initBluetooth() {
+	private void startBroadcasting(CompoundButton compoundButton, boolean isChecked) {
+		Intent service = new Intent(this, IphoneConnectionService.class);
+		if (isChecked) {
+			startService(service);
+		} else {
+			stopService(service);
+		}
+    }
+
+    private void initBluetooth() {
 		PackageManager pm = getPackageManager();
 		boolean support = pm.hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE);
 		if (!support) {
@@ -211,6 +226,7 @@ public class MainActivity extends ListActivity {
 	@Override
 	protected void onDestroy() {
 		scan(false);
+
 		super.onDestroy();
 	}
 	@Override
