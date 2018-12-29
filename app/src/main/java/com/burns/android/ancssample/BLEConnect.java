@@ -3,7 +3,6 @@ package com.burns.android.ancssample;
 
 import com.burns.android.ancssample.ANCSGattCallback.StateListener;
 import com.burns.android.ancssample.BLEservice.MyBinder;
-import com.burns.android.ancssample.R;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -21,6 +20,9 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import static com.burns.android.ancssample.BLEservice.EXTRA_BT_ADDRESS;
+import static com.burns.android.ancssample.BLEservice.EXTRA_IS_AUTO_CONNECT;
 
 
 public class BLEConnect extends Activity implements StateListener{
@@ -44,8 +46,8 @@ public class BLEConnect extends Activity implements StateListener{
 		mViewState = (TextView)findViewById(R.id.ble_state);
 		mExitService= (CheckBox)findViewById(R.id.exit_service);
 		
-		addr = getIntent().getStringExtra("addr");
-		mAuto = getIntent().getBooleanExtra("auto", true);
+		addr = getIntent().getStringExtra(EXTRA_BT_ADDRESS);
+		mAuto = getIntent().getBooleanExtra(EXTRA_IS_AUTO_CONNECT, true);
 		
 		mSharedP = getSharedPreferences(MainActivity.PREFS_NAME, 0);
 		
@@ -67,8 +69,8 @@ public class BLEConnect extends Activity implements StateListener{
 		
 		mCachedState = getIntent().getIntExtra("state", 0);
 		mIntent = new Intent(this, BLEservice.class);
-		mIntent.putExtra("addr", addr);
-		mIntent.putExtra("auto", mAuto);
+		mIntent.putExtra(EXTRA_BT_ADDRESS, addr);
+		mIntent.putExtra(EXTRA_IS_AUTO_CONNECT, mAuto);
 		startService(mIntent);
 
 //		if (!BluetoothAdapter.checkBluetoothAddress(addr)) {

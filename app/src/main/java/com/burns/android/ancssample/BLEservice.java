@@ -2,7 +2,6 @@ package com.burns.android.ancssample;
 
 
 import com.burns.android.ancssample.ANCSGattCallback.StateListener;
-import com.burns.android.ancssample.R;
 
 import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
@@ -24,12 +23,15 @@ import android.os.Message;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 
 public class BLEservice extends Service implements ANCSParser.onIOSNotification
 		, ANCSGattCallback.StateListener{
+
+	public static final String EXTRA_BT_ADDRESS = "addr";
+	public static final String EXTRA_IS_AUTO_CONNECT = "auto";
+
 	private static final String TAG="BLEservice";
 	private final IBinder mBinder = new MyBinder();
     private NotificationManager notificationManager;
@@ -94,8 +96,8 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		if (intent != null) {
-			mAuto = intent.getBooleanExtra("auto", true);
-			addr = intent.getStringExtra("addr");
+			mAuto = intent.getBooleanExtra(BLEservice.EXTRA_IS_AUTO_CONNECT, true);
+			addr = intent.getStringExtra(BLEservice.EXTRA_BT_ADDRESS);
 		}
 		Log.i(TAG,"onStartCommand() flags="+flags+",stardId="+startId);
 		return START_STICKY_COMPATIBILITY;

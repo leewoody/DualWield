@@ -5,9 +5,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import com.burns.android.ancssample.R;
-import com.tbruyelle.rxpermissions2.RxPermissions;
-
 import android.graphics.Color;
 import android.text.TextUtils;
 import android.util.Log;
@@ -21,7 +18,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,7 +30,6 @@ import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.os.Build;
 
 public class MainActivity extends ListActivity {
 
@@ -172,8 +167,8 @@ public class MainActivity extends ListActivity {
 			boolean auto = sp.getBoolean(BleAutoKey, true);
 			String addr = sp.getString(BleAddrKey, "");
 			Intent intent = new Intent(this,  BLEConnect.class);
-			intent.putExtra("addr", addr);
-			intent.putExtra("auto", auto);
+			intent.putExtra(BLEservice.EXTRA_BT_ADDRESS, addr);
+			intent.putExtra(BLEservice.EXTRA_IS_AUTO_CONNECT, auto);
 			intent.putExtra("state", ble_state);
 			startActivity(intent);
 			finish();
@@ -255,8 +250,8 @@ public class MainActivity extends ListActivity {
 
 	private void connectToDevice(BluetoothDevice dev) {
 		Intent intent = new Intent(this,  BLEConnect.class);
-		intent.putExtra("addr", dev.getAddress());
-		intent.putExtra("auto", mAutoCB.isChecked());
+		intent.putExtra(BLEservice.EXTRA_BT_ADDRESS, dev.getAddress());
+		intent.putExtra(BLEservice.EXTRA_IS_AUTO_CONNECT, mAutoCB.isChecked());
 		startActivity(intent);
 		finish();
 	}
