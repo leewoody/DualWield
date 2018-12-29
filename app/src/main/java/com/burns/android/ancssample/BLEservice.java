@@ -37,6 +37,8 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification
 	private static final String TAG="BLEservice";
 	private static final String CHANNEL_ONGOING = "CHANNEL_ONGOING";
 
+	private static final int IOS_NOTIFS_OFFSET = 100;
+
 	private final IBinder mBinder = new MyBinder();
     private NotificationManager notificationManager;
     private ANCSParser mANCSHandler;
@@ -141,7 +143,7 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification
             .setSmallIcon(R.drawable.ic_launcher)
             .setContentTitle(noti.title)
             .setContentText(noti.message);
-		notificationManager.notify(noti.uid, build.build());
+		notificationManager.notify(noti.uid + IOS_NOTIFS_OFFSET, build.build());
 	}
 
     private String getChannel(IOSNotification noti) {
@@ -172,12 +174,12 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification
 
     @Override
 	public void onIOSNotificationRemove(int uid) {
-		notificationManager.cancel(uid);
+		notificationManager.cancel(uid + IOS_NOTIFS_OFFSET);
 	}
 	
 	//** public method , for client to call
 	public void startBleConnect(String addr, boolean auto) {
-		Log.i(TAG,"startBleConnect");
+		Log.i(TAG,"startBleConnect auto: " + auto);
 		if (mBleANCS_state != 0) {
 			Log.i(TAG,"stop ancs,then restart it");
 			mANCScb.stop();
@@ -230,7 +232,7 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification
 						.setContentIntent(pendingIntent)
 						.build();
 
-		startForeground(5987, notification);
+		startForeground(IOS_NOTIFS_OFFSET - 1, notification);
 	}
 
 	private void createOngoingNotificationChannel() {
