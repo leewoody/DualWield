@@ -58,6 +58,7 @@ public class BLEConnect extends Activity implements StateListener{
 				@Override
 				public void onClick(View arg0) {
 					if (null != mBLEservice) {
+						mBLEservice.startBleConnect(addr, mAuto);
 						mBLEservice.connect();
 						Toast.makeText(BLEConnect.this,
 								R.string.connect_notice, Toast.LENGTH_SHORT)
@@ -147,7 +148,9 @@ public class BLEConnect extends Activity implements StateListener{
 		}
 		else if (ANCSGattCallback.BleDisconnect == mCachedState) {
 			Log.i(TAG, "connect ble");
-			mBLEservice.startBleConnect(addr, mAuto);
+			if (!mAuto) {
+				mBLEservice.startBleConnect(addr, mAuto);
+			}
 			mBLEservice.registerStateChanged(this);
 		} else { // just display current state
 			

@@ -68,7 +68,8 @@ public class ANCSParser {
 	Context mContext;
 	private static ANCSParser sInst;
 	
-	private ArrayList<onIOSNotification> mListeners=new ArrayList<onIOSNotification>(); 
+	private ArrayList<onIOSNotification> mListeners=new ArrayList<onIOSNotification>();
+
 	public interface onIOSNotification{
 		void onIOSNotificationAdd(IOSNotification n);
 		void onIOSNotificationRemove(int uid);
@@ -121,7 +122,10 @@ public class ANCSParser {
 		if(!mListeners.contains(lis))
 			mListeners.add(lis);
 	}
-	
+
+	public void removeListenerIOSNotification(onIOSNotification lis) {
+		mListeners.remove(lis);
+	}
 
 	public void setService(BluetoothGattService bgs, BluetoothGatt bg) {
 		mGatt = bg;

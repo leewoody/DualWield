@@ -64,6 +64,7 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification
     };
     // when bt off,  show a Message to notify user that ble need re_connect
     private void startActivityMsg(){
+    	// TODO(tyler): post notification instead.
     	Intent i = new Intent(this,Notice.class);
     	i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
     	startActivity(i);
@@ -76,6 +77,8 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification
         notificationManager = ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE));
 
 		mANCSHandler = ANCSParser.getDefault(this);
+		mANCSHandler.listenIOSNotification(this);
+
 		mANCScb = new ANCSGattCallback(this, mANCSHandler);
 		mBtOnOffReceiver = new BroadcastReceiver() {
 			public void onReceive(Context arg0, Intent i) {
@@ -98,6 +101,10 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification
 		if (intent != null) {
 			mAuto = intent.getBooleanExtra(BLEservice.EXTRA_IS_AUTO_CONNECT, true);
 			addr = intent.getStringExtra(BLEservice.EXTRA_BT_ADDRESS);
+
+			if (mAuto) {
+				startBleConnect(addr, mAuto);
+			}
 		}
 		Log.i(TAG,"onStartCommand() flags="+flags+",stardId="+startId);
 		return START_STICKY_COMPATIBILITY;
@@ -108,6 +115,7 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification
 	public void onDestroy() {
 		Log.i(TAG," onDestroy()");
 		mANCScb.stop();
+		mANCSHandler.removeListenerIOSNotification(this);
 		unregisterReceiver(mBtOnOffReceiver);
 		Editor e =getSharedPreferences(MainActivity.PREFS_NAME, 0).edit();
 		e.putInt(MainActivity.BleStateKey, ANCSGattCallback.BleDisconnect);
@@ -172,7 +180,6 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification
 		mAuto = auto;
 		this.addr = addr;
 		BluetoothDevice dev = BluetoothAdapter.getDefaultAdapter().getRemoteDevice(addr);
-		mANCSHandler.listenIOSNotification(this);
 		mBluetoothGatt = dev.connectGatt(this, auto, mANCScb, BluetoothDevice.TRANSPORT_LE);
 		mANCScb.setBluetoothGatt(mBluetoothGatt);
 		mANCScb.setStateStart();
