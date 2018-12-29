@@ -14,4 +14,8 @@
     <string name="connect_notice">Connecting...</string>
     <string name="error_permissions">You must grant permissions</string>
     <string name="channel_description">Notifications from the %s iPhone app</string>
+
+    <string name="ongoing_notification_title">Mirroring notifications</string>
+    <string name="ongoing_notification_message">Mirroring notifications from the iPhone</string>
+    <string name="ongoing_notification_channel_description">Status of iPhone mirroring service</string>
 </resources>

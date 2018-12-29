@@ -4,8 +4,10 @@ package com.burns.android.ancssample;
 import com.burns.android.ancssample.ANCSGattCallback.StateListener;
 
 import android.annotation.SuppressLint;
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -33,6 +35,8 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification
 	public static final String EXTRA_IS_AUTO_CONNECT = "auto";
 
 	private static final String TAG="BLEservice";
+	private static final String CHANNEL_ONGOING = "CHANNEL_ONGOING";
+
 	private final IBinder mBinder = new MyBinder();
     private NotificationManager notificationManager;
     private ANCSParser mANCSHandler;
@@ -75,6 +79,7 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification
 		super.onCreate();
 		Log.i(TAG, "onCreate");
         notificationManager = ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE));
+		createOngoingNotificationChannel();
 
 		mANCSHandler = ANCSParser.getDefault(this);
 		mANCSHandler.listenIOSNotification(this);
@@ -183,6 +188,8 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification
 		mBluetoothGatt = dev.connectGatt(this, auto, mANCScb, BluetoothDevice.TRANSPORT_LE);
 		mANCScb.setBluetoothGatt(mBluetoothGatt);
 		mANCScb.setStateStart();
+
+		postOngoing();
 	}
 
 	public void registerStateChanged(StateListener sl) {
@@ -208,5 +215,36 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification
 	public void onStateChanged(int state) {
 		mBleANCS_state = state;
 	}
-	
+
+
+	private void postOngoing() {
+		Intent notificationIntent = new Intent(this, MainActivity.class);
+		PendingIntent pendingIntent =
+				PendingIntent.getActivity(this, 0, notificationIntent, 0);
+
+		Notification notification =
+				new Notification.Builder(this, CHANNEL_ONGOING)
+						.setContentTitle(getText(R.string.ongoing_notification_title))
+						.setContentText(getText(R.string.ongoing_notification_message))
+						.setSmallIcon(R.drawable.ic_launcher)
+						.setContentIntent(pendingIntent)
+						.build();
+
+		startForeground(5987, notification);
+	}
+
+	private void createOngoingNotificationChannel() {
+		// Create the NotificationChannel, but only on API 26+ because
+		// the NotificationChannel class is new and not in the support library
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+			String description = getString(R.string.ongoing_notification_channel_description);
+			String name = getString(R.string.app_name);
+			int importance = NotificationManager.IMPORTANCE_LOW;
+			NotificationChannel channel = new NotificationChannel(CHANNEL_ONGOING, name, importance);
+			channel.setDescription(description);
+			// Register the channel with the system; you can't change the importance
+			// or other notification behaviors after this
+			notificationManager.createNotificationChannel(channel);
+		}
+	}
 }
