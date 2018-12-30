@@ -26,6 +26,7 @@ public class ANCSParser {
 
 	public final static int CommandIDGetNotificationAttributes = 0;
 	public final static int CommandIDGetAppAttributes = 1;
+	public final static int CommandIDPerformNotificationAction = 2;
 
 	public final static int EventFlagSilent = (1 << 0);
 	public final static int EventFlagImportant = (1 << 1);
@@ -45,6 +46,11 @@ public class ANCSParser {
 	public final static int CategoryIDBusinessAndFinance = 9;
 	public final static int CategoryIDLocation = 10;
 	public final static int CategoryIDEntertainment = 11;
+
+	public final static int ActionIDPositive = 0;
+	public final static int ActionIDNegative = 1;
+
+
 
 	// !ANCS constants
 
@@ -299,7 +305,7 @@ public class ANCSParser {
 				if (null != cha ) {
 					ByteArrayOutputStream bout = new ByteArrayOutputStream();
 	
-					bout.write((byte) 0); 
+					bout.write((byte) CommandIDGetNotificationAttributes);
 			
 					bout.write(mCurData.notifyData[4]);
 					bout.write(mCurData.notifyData[5]);
@@ -397,6 +403,40 @@ public class ANCSParser {
 
 	public void reset() {
 		mHandler.sendEmptyMessage(MSG_RESET);
+	}
+
+	public void clearNotification(int notificationId) {
+		Log.d(TAG, "clearNotification " + notificationId);
+		mHandler.post(() ->
+			performNotificationAction(notificationId, ActionIDNegative)
+		);
+	}
+
+	private void performNotificationAction(int notificationId, int actionId) {
+		// get attribute if needed!
+		BluetoothGattCharacteristic cha = mService
+				.getCharacteristic(GattConstant.Apple.sUUIDControl);
+		if (null != cha ) {
+			ByteArrayOutputStream bout = new ByteArrayOutputStream();
+
+			bout.write((byte) CommandIDPerformNotificationAction);
+
+			bout.write(0xFF & (notificationId));
+			bout.write(0xFF & (notificationId >> 8));
+			bout.write(0xFF & (notificationId >> 16));
+			bout.write(0xFF & (notificationId >> 24));
+
+			bout.write(actionId);
+
+			byte[] data = bout.toByteArray();
+
+			cha.setValue(data);
+			mGatt.writeCharacteristic(cha);
+			Log.i(TAG,"performNotificationAction.");
+			return;
+		} else {
+			Log.w(TAG,"ANCS has No Control Point !");
+		}
 	}
 	
 	void logD(byte[] d){

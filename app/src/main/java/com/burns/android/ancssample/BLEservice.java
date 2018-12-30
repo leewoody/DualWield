@@ -51,7 +51,9 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification
 	String addr;
 	int mBleANCS_state = 0;
     private final List<String> notificationChannels = new ArrayList<>();
+
 	private IosIconRepo iconRepo;
+	private NotificationDeleter deleter;
 
 	public class MyBinder extends Binder {
     	BLEservice getService() {
@@ -92,6 +94,9 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification
 		mANCSHandler = ANCSParser.getDefault(this);
 		mANCSHandler.listenIOSNotification(this);
 
+		deleter = new NotificationDeleter(mANCSHandler);
+		deleter.register(this);
+
 		mANCScb = new ANCSGattCallback(this, mANCSHandler);
 		mBtOnOffReceiver = new BroadcastReceiver() {
 			public void onReceive(Context arg0, Intent i) {
@@ -127,6 +132,7 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification
 	@Override
 	public void onDestroy() {
 		Log.i(TAG," onDestroy()");
+		deleter.unregister();
 		mANCScb.stop();
 		mANCSHandler.removeListenerIOSNotification(this);
 		unregisterReceiver(mBtOnOffReceiver);
@@ -155,11 +161,13 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification
 		NotificationCompat.Builder build = new NotificationCompat.Builder(this, getChannel(noti))
             .setSmallIcon(iconRepo.getResourceIdForCategoryIcon(noti))
             .setContentTitle(noti.title)
-            .setContentText(text);
+            .setContentText(text)
+			.setAutoCancel(false)
+			.setDeleteIntent(deleter.createDeleteIntent(noti));
 		notificationManager.notify(noti.uid + IOS_NOTIFS_OFFSET, build.build());
 	}
 
-    private String getChannel(IOSNotification noti) {
+	private String getChannel(IOSNotification noti) {
         // TODO: make a channel per iPhone app id.
         String channelId = "allappspackage";
 
