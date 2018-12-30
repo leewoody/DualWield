@@ -32,7 +32,7 @@ public class WeakList<T> extends AbstractList<T> {
         items = new ArrayList<>();
     }
 
-    public WeakList(Collection c) {
+    public WeakList(Collection<T> c) {
         items = new ArrayList<>();
         addAll(0, c);
     }
