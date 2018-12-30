@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#fefffe">
+
+    <ImageView
+        android:id="@+id/image_left"
+        android:layout_toStartOf="@+id/image"
+        style="@style/OnboardingImage"/>
+
+    <ImageView
+        android:id="@+id/image_right"
+        android:layout_toEndOf="@+id/image"
+        style="@style/OnboardingImage"/>
+
+    <ImageView
+        android:id="@+id/image"
+        style="@style/OnboardingImage"/>
+
+    <Space
+        android:id="@+id/center_divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_centerInParent="true" />
+
+    <TextView
+        android:id="@+id/label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/center_divider"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="28dp"
+        android:gravity="center_horizontal"
+        android:textSize="24sp"
+        tools:text="Find what makes you happy"/>
+
+    <TextView
+        android:id="@+id/description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/label"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:gravity="center_horizontal"
+        android:textSize="18sp"
+        android:textColor="@color/secondary_text"
+        tools:text="Enable locations for fun and profit"/>
+
+
+</RelativeLayout>
