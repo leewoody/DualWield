@@ -169,7 +169,7 @@ public class ANCSParser {
 			notifyData = data;
 			curStep = 0;
 			timeExpired = System.currentTimeMillis();
-			noti=new  IOSNotification();
+			noti= new IOSNotification();
 		}
 
 		void clear() {
@@ -206,12 +206,13 @@ public class ANCSParser {
 					| ((0xff & data[2]) << 8) | ((0xff &data[1]));
 			if (uid != mCurData.getUID()) {
 	
-				Log.i(TAG,"bad uid: " + uid + "->" + mCurData.getUID());
+				Log.w(TAG,"bad uid: " + uid + "->" + mCurData.getUID());
 				return;
 			}
 
 			// read attributes
 			noti.uid = uid;
+			noti.category = notifyData[2];
 			int curIdx = 5; //hard code
 			while (true) {
 				if (noti.isAllInit()) {
@@ -274,16 +275,15 @@ public class ANCSParser {
 						|| mCurData.notifyData.length != 8) {
 					mCurData = null; // ignore
 			
-					Log.i(TAG,"ANCS Bad Head!");
+					Log.w(TAG,"ANCS Bad Head!");
 					break;
 				}
 				if(EventIDNotificationRemoved ==mCurData.notifyData[0]){
-					
-					int uid=(mCurData.notifyData[4]&0xff) |
-							(mCurData.notifyData[5]&0xff<<8)|
-							(mCurData.notifyData[6]&0xff<<16)|
-							(mCurData.notifyData[7]&0xff<<24);
-					cancelNotification(uid);
+//					int uid=(mCurData.notifyData[4]&0xff) |
+//							(mCurData.notifyData[5]&0xff<<8)|
+//							(mCurData.notifyData[6]&0xff<<16)|
+//							(mCurData.notifyData[7]&0xff<<24);
+					cancelNotification(mCurData.getUID());
 					mCurData = null;
 					break;
 				}

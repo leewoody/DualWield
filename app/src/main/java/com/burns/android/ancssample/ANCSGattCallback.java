@@ -255,15 +255,15 @@ public class ANCSGattCallback extends BluetoothGattCallback {
 			}
 		}
 		//add a notification
-		mnoti=new  IOSNotification();
-		mnoti.title="ANCS_Server";
-		mnoti.message = "ANCS_run";
-		mnoti.uid=0;
-		NotificationCompat.Builder build = new NotificationCompat.Builder(mContext)
-		.setSmallIcon(R.drawable.ic_launcher)
-		.setContentTitle(mnoti.title)
-		.setContentText(mnoti.message);
-		((NotificationManager)mContext.getSystemService(Context.NOTIFICATION_SERVICE)).notify(mnoti.uid, build.build());
+//		mnoti=new  IOSNotification();
+//		mnoti.title="ANCS_Server";
+//		mnoti.message = "ANCS_run";
+//		mnoti.uid=0;
+//		NotificationCompat.Builder build = new NotificationCompat.Builder(mContext)
+//		.setSmallIcon(R.drawable.ic_launcher)
+//		.setContentTitle(mnoti.title)
+//		.setContentText(mnoti.message);
+//		((NotificationManager)mContext.getSystemService(Context.NOTIFICATION_SERVICE)).notify(mnoti.uid, build.build());
 		//
 	}
 

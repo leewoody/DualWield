@@ -2,6 +2,7 @@ package com.burns.android.ancssample;
 
 
 import com.burns.android.ancssample.ANCSGattCallback.StateListener;
+import com.burns.android.ancssample.icons.IosIconRepo;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
@@ -23,6 +24,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.support.v4.app.NotificationCompat;
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -49,8 +51,9 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification
 	String addr;
 	int mBleANCS_state = 0;
     private final List<String> notificationChannels = new ArrayList<>();
+	private IosIconRepo iconRepo;
 
-    public class MyBinder extends Binder {
+	public class MyBinder extends Binder {
     	BLEservice getService() {
             // Return this instance  so clients can call public methods
             return BLEservice.this;
@@ -80,6 +83,9 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification
 	public void onCreate() {
 		super.onCreate();
 		Log.i(TAG, "onCreate");
+
+		iconRepo = new IosIconRepo(this);
+
         notificationManager = ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE));
 		createOngoingNotificationChannel();
 
@@ -139,10 +145,17 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification
 	//** when ios notification changed
 	@Override
 	public void onIOSNotificationAdd(IOSNotification noti) {
+		final String text;
+		if (TextUtils.isEmpty(noti.subtitle)) {
+			text = noti.message;
+		} else {
+			text = noti.subtitle + " \n" + noti.message;
+		}
+		
 		NotificationCompat.Builder build = new NotificationCompat.Builder(this, getChannel(noti))
-            .setSmallIcon(R.drawable.ic_launcher)
+            .setSmallIcon(iconRepo.getResourceIdForCategoryIcon(noti))
             .setContentTitle(noti.title)
-            .setContentText(noti.message);
+            .setContentText(text);
 		notificationManager.notify(noti.uid + IOS_NOTIFS_OFFSET, build.build());
 	}
 

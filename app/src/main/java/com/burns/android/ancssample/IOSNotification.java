@@ -16,6 +16,12 @@ public class IOSNotification {
 	public String messageSize;
 	/** the time  for the iOS notification */
 	public String date;
+
+	/** the CategoryID for the iOS notification */
+	public int category;
+
+	public IosAppPackage app;
+
 	public IOSNotification(){}
 	public IOSNotification(String t, String s, String m, String ms, String d) {
 		title = t;
