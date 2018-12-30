@@ -151,7 +151,7 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification
 		} else {
 			text = noti.subtitle + " \n" + noti.message;
 		}
-		
+
 		NotificationCompat.Builder build = new NotificationCompat.Builder(this, getChannel(noti))
             .setSmallIcon(iconRepo.getResourceIdForCategoryIcon(noti))
             .setContentTitle(noti.title)
@@ -228,6 +228,7 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification
 
 	@Override
 	public void onStateChanged(int state) {
+		Log.d(TAG, "onStateChanged " + state);
 		mBleANCS_state = state;
 		postOngoing();
 	}
@@ -238,7 +239,7 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification
 		PendingIntent pendingIntent =
 				PendingIntent.getActivity(this, 0, notificationIntent, 0);
 
-		boolean isEnabled = mBleANCS_state == ANCSGattCallback.BleAncsConnected;
+		boolean isEnabled = mBleANCS_state != ANCSGattCallback.BleDisconnect;
 
 		Notification notification =
 				new Notification.Builder(this, CHANNEL_ONGOING)
