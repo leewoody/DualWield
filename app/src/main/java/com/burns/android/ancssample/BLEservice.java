@@ -216,6 +216,7 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification
 	@Override
 	public void onStateChanged(int state) {
 		mBleANCS_state = state;
+		postOngoing();
 	}
 
 
@@ -224,12 +225,15 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification
 		PendingIntent pendingIntent =
 				PendingIntent.getActivity(this, 0, notificationIntent, 0);
 
+		boolean isEnabled = mBleANCS_state == ANCSGattCallback.BleAncsConnected;
+
 		Notification notification =
 				new Notification.Builder(this, CHANNEL_ONGOING)
-						.setContentTitle(getText(R.string.ongoing_notification_title))
-						.setContentText(getText(R.string.ongoing_notification_message))
+						.setContentTitle(getText(isEnabled ? R.string.ongoing_notification_title_enabled : R.string.ongoing_notification_title_disabled))
+						.setContentText(getText(isEnabled ? R.string.ongoing_notification_message_connected : R.string.ongoing_notification_message_disconnected))
 						.setSmallIcon(R.drawable.ic_launcher)
 						.setContentIntent(pendingIntent)
+						.setPriority(Notification.PRIORITY_LOW)
 						.build();
 
 		startForeground(IOS_NOTIFS_OFFSET - 1, notification);
