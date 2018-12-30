@@ -1,6 +1,7 @@
 package com.burns.android.ancssample;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import android.app.NotificationManager;
@@ -13,6 +14,8 @@ import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+
+import org.netbeans.modules.vcscore.util.WeakList;
 
 public class ANCSGattCallback extends BluetoothGattCallback {
 	public static final int BleDisconnect = 0;//this is same to onConnectionStateChange()'s state
@@ -32,7 +35,7 @@ public class ANCSGattCallback extends BluetoothGattCallback {
 	private BluetoothGatt mBluetoothGatt;
 	BluetoothGattService mANCSservice;
 	boolean mWritedNS,mWriteNS_DespOk;
-	private ArrayList<StateListener> mStateListeners=new ArrayList<StateListener>();
+	private List<StateListener> mStateListeners=new WeakList<StateListener>();
 
 	public interface StateListener{
 		public void onStateChanged(int state);
