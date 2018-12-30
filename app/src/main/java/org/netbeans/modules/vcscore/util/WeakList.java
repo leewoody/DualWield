@@ -21,27 +21,27 @@ import java.util.Iterator;
 
 /**
  * A simple list wich holds only weak references to the original objects.
- * @author  Martin Entlicher
+ * @author  Martin Entlicher, Tyler Freeman
  */
-public class WeakList extends AbstractList {
+public class WeakList<T> extends AbstractList<T> {
 
-    private ArrayList items;
+    private ArrayList<WeakReference<T>> items;
 
     /** Creates new WeakList */
     public WeakList() {
-        items = new ArrayList();
+        items = new ArrayList<>();
     }
 
     public WeakList(Collection c) {
-        items = new ArrayList();
+        items = new ArrayList<>();
         addAll(0, c);
     }
 
-    public void add(int index, Object element) {
-        items.add(index, new WeakReference(element));
+    public void add(int index, T element) {
+        items.add(index, new WeakReference<>(element));
     }
 
-    public Iterator iterator() {
+    public Iterator<T> iterator() {
         return new WeakListIterator();
     }
 
@@ -50,8 +50,8 @@ public class WeakList extends AbstractList {
         return items.size();
     }
 
-    public java.lang.Object get(int index) {
-        return ((WeakReference) items.get(index)).get();
+    public T get(int index) {
+        return items.get(index).get();
     }
 
     private void removeReleased() {
@@ -61,7 +61,7 @@ public class WeakList extends AbstractList {
         }
     }
 
-    private class WeakListIterator implements Iterator {
+    private class WeakListIterator implements Iterator<T> {
 
         private int n;
         private int i;
@@ -75,7 +75,7 @@ public class WeakList extends AbstractList {
             return i < n;
         }
 
-        public Object next() {
+        public T next() {
             return get(i++);
         }
 
