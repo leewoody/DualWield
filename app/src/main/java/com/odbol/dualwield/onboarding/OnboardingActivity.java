@@ -1,7 +1,7 @@
 package com.odbol.dualwield.onboarding;
 
 import android.Manifest;
-import android.graphics.Color;
+import android.bluetooth.BluetoothDevice;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -9,16 +9,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 
+import com.burns.android.ancssample.MidiGattServer;
 import com.github.paolorotolo.appintro.AppIntro;
-import com.github.paolorotolo.appintro.AppIntroFragment;
-import com.github.paolorotolo.appintro.model.SliderPage;
 import com.github.paolorotolo.appintro.util.LayoutUtil;
 
-import java.util.Arrays;
 import java.util.List;
 
 import com.burns.android.ancssample.R;
@@ -33,6 +29,8 @@ public class OnboardingActivity extends AppIntro {
     public static final int PERMISSIONS_SLIDES_START_IDX = 2;
 
     private int slideIndex = 0;
+
+    private MidiGattServer midiServer;
 
     private ViewPager.PageTransformer transformer = new ViewPager.PageTransformer() {
         @Override
@@ -161,6 +159,14 @@ public class OnboardingActivity extends AppIntro {
     }
 
     @Override
+    public void onDestroy() {
+        if (midiServer != null) {
+            midiServer.onDestroy();
+        }
+        super.onDestroy();
+    }
+
+    @Override
     public void onSkipPressed(Fragment currentFragment) {
         super.onSkipPressed(currentFragment);
 
@@ -177,13 +183,43 @@ public class OnboardingActivity extends AppIntro {
     @Override
     public void onSlideChanged(@Nullable Fragment oldFragment, @Nullable Fragment newFragment) {
         super.onSlideChanged(oldFragment, newFragment);
-        // Do something when the slide changes.
+
+        if (newFragment == null) return;
+
+        // Start broadcasting BLE service once they've granted permissions.
+        String tag = newFragment.getTag();
+        if ("2".equals(tag)) {
+            startBroadcasting();
+        } else if ("4".equals(tag)) {
+            showSkipButton(false);
+            setProgressButtonEnabled(false);
+        }
     }
 
+    private void startBroadcasting() {
+        if (midiServer == null) {
+            midiServer = new MidiGattServer(this);
+            midiServer.setListener(this::onConnected);
+        }
+    }
+
+    private void onConnected(BluetoothDevice bluetoothDevice) {
+        new DeviceRepo(this).savePairedDevice(bluetoothDevice);
+        goToDoneSlide();
+        setProgressButtonEnabled(true);
+    }
+
+    private void goToDoneSlide() {
+        if (LayoutUtil.isRtl(getResources())) {
+            pager.setCurrentItem(0);
+        } else {
+            pager.setCurrentItem(pager.getChildCount() - 1);
+        }
+    }
 
     public void goToPermissionsSlide() {
         if (LayoutUtil.isRtl(getResources())) {
-            pager.setCurrentItem(0);
+            pager.setCurrentItem(pager.getChildCount() - PERMISSIONS_SLIDES_START_IDX);
         } else {
             pager.setCurrentItem(PERMISSIONS_SLIDES_START_IDX);
         }

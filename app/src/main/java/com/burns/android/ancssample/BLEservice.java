@@ -3,6 +3,8 @@ package com.burns.android.ancssample;
 
 import com.burns.android.ancssample.ANCSGattCallback.StateListener;
 import com.burns.android.ancssample.icons.IosIconRepo;
+import com.odbol.dualwield.onboarding.DeviceRepo;
+import com.odbol.dualwield.onboarding.OnboardingActivity;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
@@ -55,7 +57,7 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification
 	private IosIconRepo iconRepo;
 	private NotificationDeleter deleter;
 
-	public class MyBinder extends Binder {
+    public class MyBinder extends Binder {
     	BLEservice getService() {
             // Return this instance  so clients can call public methods
             return BLEservice.this;
@@ -201,16 +203,30 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification
 	//** public method , for client to call
 	public void startBleConnect(String addr, boolean auto) {
 		Log.i(TAG,"startBleConnect auto: " + auto);
-		if (mBleANCS_state != 0) {
+		if (mBleANCS_state != ANCSGattCallback.BleDisconnect) {
 			Log.i(TAG,"stop ancs,then restart it");
+			mBleANCS_state = ANCSGattCallback.BleDisconnect;
 			mANCScb.stop();
 		}
 		mAuto = auto;
+		if (addr == null) {
+			addr = new DeviceRepo(this).getPairedDevice();
+		}
 		this.addr = addr;
-		BluetoothDevice dev = BluetoothAdapter.getDefaultAdapter().getRemoteDevice(addr);
-		mBluetoothGatt = dev.connectGatt(this, auto, mANCScb, BluetoothDevice.TRANSPORT_LE);
-		mANCScb.setBluetoothGatt(mBluetoothGatt);
-		mANCScb.setStateStart();
+		if (!TextUtils.isEmpty(addr)) {
+			try {
+				BluetoothDevice dev = BluetoothAdapter.getDefaultAdapter().getRemoteDevice(addr);
+				if (dev == null) {
+					throw new Exception("No device connected");
+				}
+				mBluetoothGatt = dev.connectGatt(this, auto, mANCScb, BluetoothDevice.TRANSPORT_LE);
+				mANCScb.setBluetoothGatt(mBluetoothGatt);
+				mANCScb.setStateStart();
+			} catch (Exception e) {
+				Log.e(TAG, "Failed to connect", e);
+				mBleANCS_state = ANCSGattCallback.BleDisconnect;
+			}
+		}
 
 		postOngoing();
 	}
@@ -222,7 +238,7 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification
 		mANCScb.addStateListen(this);
 	}
 	public void connect(){
-		if (!mAuto)
+		if (!mAuto && mBluetoothGatt != null)
 			mBluetoothGatt.connect();
 	}
 	

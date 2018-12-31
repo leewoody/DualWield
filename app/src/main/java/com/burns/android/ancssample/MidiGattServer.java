@@ -37,6 +37,10 @@ import static android.content.Context.BLUETOOTH_SERVICE;
 // from https://raw.githubusercontent.com/androidthings/sample-bluetooth-le-gattserver/master/java/app/src/main/java/com/example/androidthings/gattserver/GattServerActivity.java
 public class MidiGattServer {
 
+    public interface OnConnectedListener {
+        void onConnected(BluetoothDevice device);
+    }
+
     private static final String TAG = "MidiGattServer";
 
     /* Local UI */
@@ -50,9 +54,15 @@ public class MidiGattServer {
 
     private final Context context;
 
+    private OnConnectedListener listener;
+
     public MidiGattServer(Context context) {
         this.context = context;
         onCreate();
+    }
+
+    public void setListener(OnConnectedListener listener) {
+        this.listener = listener;
     }
 
     private void onCreate() {
@@ -238,30 +248,9 @@ public class MidiGattServer {
                         0,
                         new byte[0]);
 
-//            long now = System.currentTimeMillis();
-//            if (TimeProfile.CURRENT_TIME.equals(characteristic.getUuid())) {
-//                Log.i(TAG, "Read CurrentTime");
-//                mBluetoothGattServer.sendResponse(device,
-//                        requestId,
-//                        BluetoothGatt.GATT_SUCCESS,
-//                        0,
-//                        TimeProfile.getExactTime(now, TimeProfile.ADJUST_NONE));
-//            } else if (TimeProfile.LOCAL_TIME_INFO.equals(characteristic.getUuid())) {
-//                Log.i(TAG, "Read LocalTimeInfo");
-//                mBluetoothGattServer.sendResponse(device,
-//                        requestId,
-//                        BluetoothGatt.GATT_SUCCESS,
-//                        0,
-//                        TimeProfile.getLocalTimeInfo(now));
-//            } else {
-//                // Invalid characteristic
-//                Log.w(TAG, "Invalid Characteristic Read: " + characteristic.getUuid());
-//                mBluetoothGattServer.sendResponse(device,
-//                        requestId,
-//                        BluetoothGatt.GATT_FAILURE,
-//                        0,
-//                        null);
-//            }
+            if (listener != null) {
+                listener.onConnected(device);
+            }
         }
 
         @Override

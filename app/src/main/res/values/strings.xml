@@ -26,5 +26,5 @@
     <string name="onboarding_desc_1">Location permissions are required to perform Bluetooth scans</string>
     <string name="onboarding_label_2">Install Garageband on your iPhone</string>
     <string name="onboarding_label_3">Open a song in Garageband</string>
-    <string name="onboarding_label_4">Click Settings->Advanced->BLE Devices and click your Android phone to pair with it</string>
+    <string name="onboarding_label_4">Click Settings-&gt;Advanced-&gt;BLE Devices and click your Android phone to pair with it</string>
 </resources>
