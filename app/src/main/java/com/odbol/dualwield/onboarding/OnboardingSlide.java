@@ -9,10 +9,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.odbol.respects.R;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import com.burns.android.ancssample.R;
 
 public class OnboardingSlide extends Fragment {
 

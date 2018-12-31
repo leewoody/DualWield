@@ -25,6 +25,7 @@
         </activity>
         <activity android:name=".BLEConnect" />
         <activity android:name=".MainActivity" />
+        <activity android:name="com.odbol.dualwield.onboarding.OnboardingActivity" />
 
         <service android:name=".BLEservice"></service>
         <service android:name=".ExposedService" />

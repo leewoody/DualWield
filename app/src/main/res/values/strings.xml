@@ -19,4 +19,12 @@
     <string name="ongoing_notification_message_connected">Mirroring notifications from the iPhone</string>
     <string name="ongoing_notification_message_disconnected">iPhone is disconnected</string>
     <string name="ongoing_notification_channel_description">Status of iPhone mirroring service</string>
+
+
+    <string name="onboarding_label_0">Mirror notifications from your iPhone</string>
+    <string name="onboarding_label_1">Permissions for Bluetooth</string>
+    <string name="onboarding_desc_1">Location permissions are required to perform Bluetooth scans</string>
+    <string name="onboarding_label_2">Install Garageband on your iPhone</string>
+    <string name="onboarding_label_3">Open a song in Garageband</string>
+    <string name="onboarding_label_4">Click Settings->Advanced->BLE Devices and click your Android phone to pair with it</string>
 </resources>

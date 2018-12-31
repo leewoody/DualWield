@@ -17,10 +17,11 @@ import com.github.paolorotolo.appintro.AppIntro;
 import com.github.paolorotolo.appintro.AppIntroFragment;
 import com.github.paolorotolo.appintro.model.SliderPage;
 import com.github.paolorotolo.appintro.util.LayoutUtil;
-import com.odbol.respects.R;
 
 import java.util.Arrays;
 import java.util.List;
+
+import com.burns.android.ancssample.R;
 
 /**
  * Onboarding.
@@ -29,7 +30,7 @@ public class OnboardingActivity extends AppIntro {
 
     public static final String TAG = "OnboardingActivity";
 
-    public static final int PERMISSIONS_SLIDES_START_IDX = 4;
+    public static final int PERMISSIONS_SLIDES_START_IDX = 2;
 
     private int slideIndex = 0;
 
@@ -110,41 +111,32 @@ public class OnboardingActivity extends AppIntro {
         super.onCreate(savedInstanceState);
 
         addSlide(OnboardingSlide.newInstance(
+                R.string.onboarding_label_0,
+                R.drawable.logo
+        ));
+
+        addSlide(OnboardingSlide.newInstance(
+                getString(R.string.onboarding_desc_1),
                 R.string.onboarding_label_1,
-                R.drawable.emoji_u1f6ac, // 🚬
-                R.drawable.emoji_u1f354, // 🍔
-                R.drawable.emoji_u1f378 // 🍸
+                R.drawable.logo
         ));
 
         addSlide(OnboardingSlide.newInstance(
                 R.string.onboarding_label_2,
-                R.drawable.emoji_u1f620, // 😠
-                R.drawable.emoji_u1f603, // 😃
-                R.drawable.emoji_u1f60d // 😍
-        ));
-        addSlide(OnboardingSlide.newInstance(
-                R.string.onboarding_label_3,
-                R.drawable.emoji_u1f4aa_1f3fc, // 💪
-                R.drawable.emoji_u2615, // ☕
-                R.drawable.emoji_u1f3bb // 🎻
-        ));
-//        addSlide(OnboardingSlide.newInstance(
-//                R.string.onboarding_label_4,
-//                R.drawable.emoji_u1f4c9, // 📉
-//                R.drawable.emoji_u1f4ca, // 📊
-//                R.drawable.emoji_u1f4c8 // 📈
-//        ));
-        addSlide(OnboardingSlide.newInstance(
-                R.string.onboarding_label_5,
-                R.drawable.emoji_u1f389, // 🎉
-                R.drawable.emoji_u1f601, // 😊
-                R.drawable.emoji_u1f44f // 😊
+                R.drawable.logo
         ));
 
         addSlide(OnboardingSlide.newInstance(
-                getString(R.string.onboarding_permission_location_desc),
-                R.string.onboarding_permission_location,
-                R.drawable.emoji_u1f30e // 😊
+                R.string.onboarding_label_3,
+                R.drawable.logo
+        ));
+        addSlide(OnboardingSlide.newInstance(
+                R.string.onboarding_label_4,
+                R.drawable.logo
+        ));
+        addSlide(OnboardingSlide.newInstance(
+                R.string.onboarding_label_4,
+                R.drawable.logo
         ));
 
         askForPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_SLIDES_START_IDX + 1);
