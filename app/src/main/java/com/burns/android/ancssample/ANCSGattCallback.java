@@ -15,6 +15,9 @@ import android.content.Context;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import com.odbol.dualwield.events.ConnectionStatusEvent;
+import com.odbol.dualwield.events.ConnectionStatusEventBus;
+
 import org.netbeans.modules.vcscore.util.WeakList;
 
 public class ANCSGattCallback extends BluetoothGattCallback {
@@ -28,45 +31,38 @@ public class ANCSGattCallback extends BluetoothGattCallback {
 	public static final int BleBuildNotify=6; //notify arrive	
 	
 	private static final String TAG = "ANCSGattCallback";
+
+	private final ConnectionStatusEventBus eventBus;
+
 	private Context mContext;
 	IOSNotification mnoti;
-	public int mBleState;
+	private int mBleState;
 	public static ANCSParser mANCSHandler;
 	private BluetoothGatt mBluetoothGatt;
 	BluetoothGattService mANCSservice;
 	boolean mWritedNS,mWriteNS_DespOk;
-	private List<StateListener> mStateListeners=new WeakList<StateListener>();
-
-	public interface StateListener{
-		public void onStateChanged(int state);
-	}
 	
 	public ANCSGattCallback(Context c,ANCSParser ancs){
 		mContext = c;
 		mANCSHandler = ancs;
+		eventBus = ConnectionStatusEventBus.getInstance();
 	}
-
-	public void addStateListen(StateListener sl){
-		if(!mStateListeners.contains(sl)){
-			mStateListeners.add(sl);
-			sl.onStateChanged(mBleState);
-		}
-	}
-
 
 	public void stop(){
 		Log.i(TAG,"stop connectGatt..");
-		mBleState = BleDisconnect;
-		for(StateListener sl: mStateListeners){
-			sl.onStateChanged(mBleState);
-		}
+		setState(BleDisconnect);
 		if(null != mBluetoothGatt){
 			mBluetoothGatt.disconnect();
 			mBluetoothGatt.close();
 		}
 		mBluetoothGatt = null;
 		mANCSservice = null;
-		mStateListeners.clear();
+	}
+
+	private void setState(int state) {
+		Log.d(TAG, "setState " + state);
+		mBleState = state;
+		eventBus.send(new ConnectionStatusEvent(state, true));
 	}
 
 
@@ -75,10 +71,7 @@ public class ANCSGattCallback extends BluetoothGattCallback {
 	}
 	
 	public void setStateStart(){
-		mBleState = BleBuildStart;
-		for (StateListener sl : mStateListeners) {
-			sl.onStateChanged(mBleState);
-		}
+		setState(BleBuildStart);
 	}
 
 	public String getState() {
@@ -123,10 +116,7 @@ public class ANCSGattCallback extends BluetoothGattCallback {
 			byte[] data = cha.getValue();
 			mANCSHandler.onNotification(data);
 			
-			mBleState = BleBuildNotify;//6
-			for (StateListener sl : mStateListeners) {
-				sl.onStateChanged(mBleState);
-			}
+			setState(BleBuildNotify);//6
 		} else if (uuid.equals(GattConstant.Apple.sUUIDDataSource)) {
 
 			byte[] data = cha.getValue();
@@ -141,24 +131,14 @@ public class ANCSGattCallback extends BluetoothGattCallback {
 			int newState) {
 
 		Log.i(TAG,"onConnectionStateChange"+ "newState " + newState + "status:" + status);
-		mBleState = newState;
-		//below code is necessary?
-		for (StateListener sl : mStateListeners) {
-			sl.onStateChanged(mBleState);
-		}
+		setState(newState);
 		if (newState == BluetoothProfile.STATE_CONNECTED
 				&& status == BluetoothGatt.GATT_SUCCESS) {
 			Log.i(TAG,"start discover service");
-			mBleState = BleBuildDiscoverService;
-			for(StateListener sl: mStateListeners){
-				sl.onStateChanged(mBleState);
-			}
+			setState(BleBuildDiscoverService);
 			mBluetoothGatt.discoverServices();
 			Log.i(TAG,"discovery service end");
-			mBleState = BleBuildDiscoverOver;
-			for(StateListener sl: mStateListeners){
-				sl.onStateChanged(mBleState);
-			}
+			setState(BleBuildDiscoverOver);
 		} else if (0 == newState/* && mDisconnectReq*/ && mBluetoothGatt != null) {
 		}
 	}
@@ -214,10 +194,7 @@ public class ANCSGattCallback extends BluetoothGattCallback {
 		Log.i(TAG,"onDescriptorWrite"+"status:" + status);
 
 		if (15 == status || 5 == status) {
-			mBleState = BleBuildSetingANCS;//5
-			for (StateListener sl : mStateListeners) {
-				sl.onStateChanged(mBleState);
-			}
+			setState(BleBuildSetingANCS);//5
 			return;
 		}
 		if (status != BluetoothGatt.GATT_SUCCESS)
@@ -225,10 +202,7 @@ public class ANCSGattCallback extends BluetoothGattCallback {
 		//for some ble device, writedescriptor on sUUIDDataSource will return 133. fixme.
 		// status is 0, SUCCESS. 
 		if (mWritedNS && mWriteNS_DespOk) {
-			for (StateListener sl : mStateListeners) {
-				mBleState = BleAncsConnected;
-				sl.onStateChanged(mBleState);
-			}
+			setState(BleAncsConnected);
 		}
 		if (mANCSservice != null && !mWritedNS) {	// set NS
 			mWritedNS = true;
@@ -254,17 +228,6 @@ public class ANCSGattCallback extends BluetoothGattCallback {
 				Log.i(TAG,"null descriptor");
 			}
 		}
-		//add a notification
-//		mnoti=new  IOSNotification();
-//		mnoti.title="ANCS_Server";
-//		mnoti.message = "ANCS_run";
-//		mnoti.uid=0;
-//		NotificationCompat.Builder build = new NotificationCompat.Builder(mContext)
-//		.setSmallIcon(R.drawable.ic_launcher)
-//		.setContentTitle(mnoti.title)
-//		.setContentText(mnoti.message);
-//		((NotificationManager)mContext.getSystemService(Context.NOTIFICATION_SERVICE)).notify(mnoti.uid, build.build());
-		//
 	}
 
 }

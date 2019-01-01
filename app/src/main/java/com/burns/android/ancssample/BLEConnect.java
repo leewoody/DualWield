@@ -1,7 +1,6 @@
 package com.burns.android.ancssample;
 
 
-import com.burns.android.ancssample.ANCSGattCallback.StateListener;
 import com.burns.android.ancssample.BLEservice.MyBinder;
 
 import android.app.Activity;
@@ -25,7 +24,7 @@ import static com.burns.android.ancssample.BLEservice.EXTRA_BT_ADDRESS;
 import static com.burns.android.ancssample.BLEservice.EXTRA_IS_AUTO_CONNECT;
 
 
-public class BLEConnect extends Activity implements StateListener{
+public class BLEConnect extends Activity {
 	private static String TAG="BLEConnect";
 	SharedPreferences mSharedP;
 	String addr;
@@ -151,15 +150,13 @@ public class BLEConnect extends Activity implements StateListener{
 			if (!mAuto) {
 				mBLEservice.startBleConnect(addr, mAuto);
 			}
-			mBLEservice.registerStateChanged(this);
 		} else { // just display current state
 			
 			final String str = mBLEservice.getStateDes();
 			mViewState.setText(str);
 		}
 	}
-	
-	@Override
+
 	public void onStateChanged( final int state) {
 		SharedPreferences.Editor edit=mSharedP.edit();
 		edit.putInt(DevicesActivity.BleStateKey, state);

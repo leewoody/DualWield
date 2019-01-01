@@ -1,11 +1,11 @@
 package com.burns.android.ancssample;
 
 
-import com.burns.android.ancssample.ANCSGattCallback.StateListener;
 import com.burns.android.ancssample.icons.IosIconRepo;
 import com.odbol.dualwield.MainActivity;
+import com.odbol.dualwield.events.ConnectionStatusEvent;
+import com.odbol.dualwield.events.ConnectionStatusEventBus;
 import com.odbol.dualwield.onboarding.DeviceRepo;
-import com.odbol.dualwield.onboarding.OnboardingActivity;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
@@ -33,8 +33,9 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BLEservice extends Service implements ANCSParser.onIOSNotification
-		, ANCSGattCallback.StateListener{
+import io.reactivex.disposables.CompositeDisposable;
+
+public class BLEservice extends Service implements ANCSParser.onIOSNotification {
 
 	public static final String EXTRA_BT_ADDRESS = "addr";
 	public static final String EXTRA_IS_AUTO_CONNECT = "auto";
@@ -57,6 +58,8 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification
 
 	private IosIconRepo iconRepo;
 	private NotificationDeleter deleter;
+
+	private final CompositeDisposable subscriptions = new CompositeDisposable();
 
     public class MyBinder extends Binder {
     	BLEservice getService() {
@@ -116,6 +119,8 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification
 		filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);// bt on/off
 		registerReceiver(mBtOnOffReceiver, filter);
 		Log.i(TAG,"onCreate()");
+
+		subscriptions.add(ConnectionStatusEventBus.getInstance().subscribe().subscribe(this::onConnectionStatus));
 	}
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
@@ -135,6 +140,8 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification
 	@Override
 	public void onDestroy() {
 		Log.i(TAG," onDestroy()");
+		subscriptions.dispose();
+
 		deleter.unregister();
 		mANCScb.stop();
 		mANCSHandler.removeListenerIOSNotification(this);
@@ -232,12 +239,6 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification
 		postOngoing();
 	}
 
-	public void registerStateChanged(StateListener sl) {
-		Log.i(TAG,"registerStateChanged");
-		if (null != sl)
-			mANCScb.addStateListen(sl);
-		mANCScb.addStateListen(this);
-	}
 	public void connect(){
 		if (!mAuto && mBluetoothGatt != null)
 			mBluetoothGatt.connect();
@@ -251,8 +252,8 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification
 		return mBleANCS_state;
 	}
 
-	@Override
-	public void onStateChanged(int state) {
+	public void onConnectionStatus(ConnectionStatusEvent event) {
+    	int state = event.status;
 		Log.d(TAG, "onStateChanged " + state);
 		mBleANCS_state = state;
 		postOngoing();
