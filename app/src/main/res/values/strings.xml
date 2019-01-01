@@ -29,4 +29,5 @@
     <string name="onboarding_label_4">Click Settings-&gt;Advanced-&gt;BLE Devices and click your Android phone to pair with it</string>
     <string name="re_pair">Re-pair</string>
     <string name="enable_mirroring">Enable Mirroring</string>
+    <string name="ongoing_notification_message_connecting">Trying to connect...</string>
 </resources>

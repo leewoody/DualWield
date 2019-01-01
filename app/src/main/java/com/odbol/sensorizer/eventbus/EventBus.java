@@ -35,16 +35,14 @@ public class EventBus<T> {
         }
     }
 
-    public void send(T o) {
-        _bus.onNext(o);
+    public void send(T event) {
+        _bus.onNext(event);
     }
 
     /***
      * Subscribes to events only of the specified type.
-     * @param <T>
      *
      * @param eventType Type of the events to filter.
-     * @return
      */
     public <R extends T> Observable<R> subscribe(final Class<R> eventType) {
 
@@ -52,6 +50,9 @@ public class EventBus<T> {
                 .cast(eventType);
     }
 
+    /***
+     * Subscribes to all events on this bus.
+     */
     public Observable<T> subscribe() {
         return _bus;
     }

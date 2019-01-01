@@ -3,6 +3,7 @@ package com.burns.android.ancssample;
 
 import com.burns.android.ancssample.ANCSGattCallback.StateListener;
 import com.burns.android.ancssample.icons.IosIconRepo;
+import com.odbol.dualwield.MainActivity;
 import com.odbol.dualwield.onboarding.DeviceRepo;
 import com.odbol.dualwield.onboarding.OnboardingActivity;
 

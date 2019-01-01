@@ -49,7 +49,7 @@ public class BLEConnect extends Activity implements StateListener{
 		addr = getIntent().getStringExtra(EXTRA_BT_ADDRESS);
 		mAuto = getIntent().getBooleanExtra(EXTRA_IS_AUTO_CONNECT, true);
 		
-		mSharedP = getSharedPreferences(MainActivity.PREFS_NAME, 0);
+		mSharedP = getSharedPreferences(DevicesActivity.PREFS_NAME, 0);
 		
 		Log.e(TAG,"mAuto:"+ mAuto);
 		
@@ -162,9 +162,9 @@ public class BLEConnect extends Activity implements StateListener{
 	@Override
 	public void onStateChanged( final int state) {
 		SharedPreferences.Editor edit=mSharedP.edit();
-		edit.putInt(MainActivity.BleStateKey, state);
-		edit.putString(MainActivity.BleAddrKey, addr);
-		edit.putBoolean(MainActivity.BleAutoKey, mAuto);
+		edit.putInt(DevicesActivity.BleStateKey, state);
+		edit.putString(DevicesActivity.BleAddrKey, addr);
+		edit.putBoolean(DevicesActivity.BleAutoKey, mAuto);
 //		edit.commit();
 //		log("put state : "+state);
 		runOnUiThread(new Runnable() {
