@@ -12,4 +12,7 @@
 
     <color name="text_dark">@color/primary_text</color>
     <color name="text_dark_disabled">@color/secondary_text</color>
+
+    <color name="text_light">@color/icons</color>
+    <color name="text_light_disabled">@color/divider</color>
 </resources>

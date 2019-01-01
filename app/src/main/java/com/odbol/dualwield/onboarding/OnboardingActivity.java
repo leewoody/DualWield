@@ -133,7 +133,7 @@ public class OnboardingActivity extends AppIntro {
                 R.drawable.logo
         ));
         addSlide(OnboardingSlide.newInstance(
-                R.string.onboarding_label_4,
+                R.string.onboarding_label_5,
                 R.drawable.logo
         ));
 
@@ -143,14 +143,14 @@ public class OnboardingActivity extends AppIntro {
         // OPTIONAL METHODS
         // Override bar/separator color.
         setBarColor(getColor(R.color.primary));
-        setIndicatorColor(getColor(R.color.text_dark), getColor(R.color.text_dark_disabled));
-        setColorDoneText(getColor(R.color.text_dark));
-        setColorSkipButton(getColor(R.color.text_dark_disabled));
-        setNextArrowColor(getColor(R.color.text_dark));
+        setIndicatorColor(getColor(R.color.text_light), getColor(R.color.text_light_disabled));
+        setColorDoneText(getColor(R.color.text_light));
+        setColorSkipButton(getColor(R.color.text_light_disabled));
+        setNextArrowColor(getColor(R.color.text_light));
         setSeparatorColor(getColor(R.color.primary));
 
         // Hide Skip/Done button.
-        showSkipButton(true);
+        showSkipButton(false);
         setProgressButtonEnabled(true);
 
         // TODO: re-enable when you're sober
@@ -170,7 +170,12 @@ public class OnboardingActivity extends AppIntro {
     public void onSkipPressed(Fragment currentFragment) {
         super.onSkipPressed(currentFragment);
 
-        goToPermissionsSlide();
+        int index = ((OnboardingSlide)currentFragment).getSlideIndex();
+        if (index < PERMISSIONS_SLIDES_START_IDX) {
+            goToPermissionsSlide();
+        } else {
+            goToDoneSlide();
+        }
     }
 
     @Override
@@ -187,10 +192,11 @@ public class OnboardingActivity extends AppIntro {
         if (newFragment == null) return;
 
         // Start broadcasting BLE service once they've granted permissions.
-        String tag = newFragment.getTag();
-        if ("2".equals(tag)) {
+        int index = ((OnboardingSlide)newFragment).getSlideIndex();
+        Log.d(TAG, "onSlideChanged " + index);
+        if (index == 2) {
             startBroadcasting();
-        } else if ("4".equals(tag)) {
+        } else if (index == 4) {
             showSkipButton(false);
             setProgressButtonEnabled(false);
         }
@@ -204,23 +210,25 @@ public class OnboardingActivity extends AppIntro {
     }
 
     private void onConnected(BluetoothDevice bluetoothDevice) {
-        new DeviceRepo(this).savePairedDevice(bluetoothDevice);
-        setResult(RESULT_OK);
-        goToDoneSlide();
-        setProgressButtonEnabled(true);
+        runOnUiThread(() -> {
+            new DeviceRepo(this).savePairedDevice(bluetoothDevice);
+            setResult(RESULT_OK);
+            goToDoneSlide();
+            setProgressButtonEnabled(true);
+        });
     }
 
     private void goToDoneSlide() {
         if (LayoutUtil.isRtl(getResources())) {
             pager.setCurrentItem(0);
         } else {
-            pager.setCurrentItem(pager.getChildCount() - 1);
+            pager.setCurrentItem(getSlides().size() - 1);
         }
     }
 
     public void goToPermissionsSlide() {
         if (LayoutUtil.isRtl(getResources())) {
-            pager.setCurrentItem(pager.getChildCount() - PERMISSIONS_SLIDES_START_IDX);
+            pager.setCurrentItem(getSlides().size() - PERMISSIONS_SLIDES_START_IDX);
         } else {
             pager.setCurrentItem(PERMISSIONS_SLIDES_START_IDX);
         }

@@ -10,7 +10,7 @@
     <string name="stop_scan">Stop Scan</string>
     <string name="bt_off_msg">Bluetooth had been closed.</string>
     <string name="exit_service">exit service</string>
-    <string name="connect_notice">Connecting...</string>
+    <string name="connect_notice">Connecting…</string>
     <string name="error_permissions">You must grant permissions</string>
     <string name="channel_description">Notifications from the %s iPhone app</string>
 
@@ -27,7 +27,8 @@
     <string name="onboarding_label_2">Install Garageband on your iPhone</string>
     <string name="onboarding_label_3">Open a song in Garageband</string>
     <string name="onboarding_label_4">Click Settings-&gt;Advanced-&gt;Bluetooth MIDI Devices and click your Android phone to pair with it</string>
+    <string name="onboarding_label_5">Success! Click Done to start mirroring notifications.</string>
     <string name="re_pair">Re-pair</string>
-    <string name="enable_mirroring">Enable Mirroring</string>
-    <string name="ongoing_notification_message_connecting">Trying to connect...</string>
+    <string name="enable_mirroring">Enable Notification Mirroring</string>
+    <string name="ongoing_notification_message_connecting">Trying to connect…</string>
 </resources>

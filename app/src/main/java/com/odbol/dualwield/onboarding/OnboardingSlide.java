@@ -25,7 +25,6 @@ public class OnboardingSlide extends Fragment {
     private TextView labelView;
     private TextView descriptionView;
 
-
     private int slideIndex;
 
     private final List<ImageView> imageViews = new ArrayList<>(3);
@@ -36,6 +35,10 @@ public class OnboardingSlide extends Fragment {
 
     public void setSlideIndex(int slideIndex) {
         this.slideIndex = slideIndex;
+    }
+
+    public int getSlideIndex() {
+        return slideIndex;
     }
 
     public static OnboardingSlide newInstance(int label, int... images) {
