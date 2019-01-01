@@ -27,12 +27,14 @@
         <activity android:name=".MainActivity" />
         <activity android:name="com.odbol.dualwield.onboarding.OnboardingActivity" />
 
-        <service android:name=".BLEservice"></service>
+        <service android:name=".BLEservice" />
         <service android:name=".ExposedService" />
         <service
             android:name=".IphoneConnectionService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
+
+        <activity android:name="com.odbol.dualwield.MainActivity"></activity>
     </application>
 
 </manifest>

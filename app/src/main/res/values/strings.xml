@@ -27,4 +27,6 @@
     <string name="onboarding_label_2">Install Garageband on your iPhone</string>
     <string name="onboarding_label_3">Open a song in Garageband</string>
     <string name="onboarding_label_4">Click Settings-&gt;Advanced-&gt;BLE Devices and click your Android phone to pair with it</string>
+    <string name="re_pair">Re-pair</string>
+    <string name="enable_mirroring">Enable Mirroring</string>
 </resources>
