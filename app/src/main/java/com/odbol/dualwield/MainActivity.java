@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
 
         rePairButton.setOnClickListener((v) -> {
             disconnect();
-            startActivity(new Intent(this, OnboardingActivity.class));
+            startOnboarding();
         });
 
         subscriptions.add(ConnectionStatusEventBus.getInstance().subscribe().subscribe(this::onConnectionStatus));
@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         if (new DeviceRepo(this).getPairedDevice() == null) {
-            startActivityForResult(new Intent(this, OnboardingActivity.class), REQUEST_CODE_ONBOARDING);
+            startOnboarding();
         }
         else {
             subscriptions.add(new RxPermissions(this)
@@ -80,6 +80,10 @@ public class MainActivity extends AppCompatActivity {
                                 finish();
                             }));
         }
+    }
+
+    private void startOnboarding() {
+        startActivityForResult(new Intent(this, OnboardingActivity.class), REQUEST_CODE_ONBOARDING);
     }
 
     @Override
