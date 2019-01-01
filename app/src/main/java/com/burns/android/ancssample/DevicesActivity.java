@@ -31,7 +31,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends ListActivity {
+public class DevicesActivity extends ListActivity {
 
 	public static final String TAG = "ANSI_BLE";
 	
@@ -50,7 +50,7 @@ public class MainActivity extends ListActivity {
 		public View getView(int i, View arg1, ViewGroup arg2) {
 			TextView tv = (TextView) arg1;
 			if (null == tv) {
-				tv = new TextView(MainActivity.this);
+				tv = new TextView(DevicesActivity.this);
 				tv.setPadding(10, 10, 10, 10);
 				tv.setTextSize(20);
 			}
