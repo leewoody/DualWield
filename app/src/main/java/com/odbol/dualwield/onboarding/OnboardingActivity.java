@@ -137,7 +137,7 @@ public class OnboardingActivity extends AppIntro {
                 R.drawable.logo
         ));
 
-        askForPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_SLIDES_START_IDX + 1);
+        askForPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_SLIDES_START_IDX);
 
 
         // OPTIONAL METHODS
@@ -205,6 +205,7 @@ public class OnboardingActivity extends AppIntro {
 
     private void onConnected(BluetoothDevice bluetoothDevice) {
         new DeviceRepo(this).savePairedDevice(bluetoothDevice);
+        setResult(RESULT_OK);
         goToDoneSlide();
         setProgressButtonEnabled(true);
     }

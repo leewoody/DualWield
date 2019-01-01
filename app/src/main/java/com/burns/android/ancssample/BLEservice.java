@@ -139,8 +139,8 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification
 		mANCScb.stop();
 		mANCSHandler.removeListenerIOSNotification(this);
 		unregisterReceiver(mBtOnOffReceiver);
-		Editor e =getSharedPreferences(MainActivity.PREFS_NAME, 0).edit();
-		e.putInt(MainActivity.BleStateKey, ANCSGattCallback.BleDisconnect);
+		Editor e =getSharedPreferences(DevicesActivity.PREFS_NAME, 0).edit();
+		e.putInt(DevicesActivity.BleStateKey, ANCSGattCallback.BleDisconnect);
 		e.commit();
 		super.onDestroy();
 	}
@@ -269,7 +269,7 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification
 		Notification notification =
 				new Notification.Builder(this, CHANNEL_ONGOING)
 						.setContentTitle(getText(isEnabled ? R.string.ongoing_notification_title_enabled : R.string.ongoing_notification_title_disabled))
-						.setContentText(getText(isEnabled ? R.string.ongoing_notification_message_connected : R.string.ongoing_notification_message_disconnected))
+						.setContentText(getText(MainActivity.getStateMessage(mBleANCS_state)))
 						.setSmallIcon(R.drawable.ic_launcher)
 						.setContentIntent(pendingIntent)
 						.setPriority(Notification.PRIORITY_LOW)
