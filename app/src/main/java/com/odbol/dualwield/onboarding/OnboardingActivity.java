@@ -1,7 +1,9 @@
 package com.odbol.dualwield.onboarding;
 
 import android.Manifest;
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -27,6 +29,8 @@ public class OnboardingActivity extends AppIntro {
     public static final String TAG = "OnboardingActivity";
 
     public static final int PERMISSIONS_SLIDES_START_IDX = 2;
+
+    private static final int REQUEST_ENABLE_BT = 2344;
 
     private int slideIndex = 0;
 
@@ -203,6 +207,13 @@ public class OnboardingActivity extends AppIntro {
     }
 
     private void startBroadcasting() {
+        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (!bluetoothAdapter.isEnabled()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+            return;
+        }
+
         if (midiServer == null) {
             midiServer = new MidiGattServer(this);
             midiServer.setListener(this::onConnected);
@@ -237,5 +248,15 @@ public class OnboardingActivity extends AppIntro {
     public void addSlide(@NonNull OnboardingSlide fragment) {
         fragment.setSlideIndex(slideIndex++);
         super.addSlide(fragment);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == REQUEST_ENABLE_BT) {
+            if (resultCode == RESULT_OK) {
+                startBroadcasting();
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

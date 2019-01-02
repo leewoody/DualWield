@@ -76,7 +76,7 @@ public class ANCSParser {
 	Context mContext;
 	private static ANCSParser sInst;
 	
-	private List<onIOSNotification> mListeners = new WeakList<>();
+	private List<onIOSNotification> mListeners = new ArrayList<>();
 
 	public interface onIOSNotification{
 		void onIOSNotificationAdd(IOSNotification n);

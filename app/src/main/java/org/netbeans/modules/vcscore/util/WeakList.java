@@ -63,24 +63,23 @@ public class WeakList<T> extends AbstractList<T> {
 
     private class WeakListIterator implements Iterator<T> {
 
-        private int n;
-        private int i;
+        private final Iterator<WeakReference<T>> it;
 
         public WeakListIterator() {
-            n = size();
-            i = 0;
+            removeReleased();
+            it = items.iterator();
         }
 
         public boolean hasNext() {
-            return i < n;
+            return it.hasNext();
         }
 
         public T next() {
-            return get(i++);
+            return it.next().get();
         }
 
         public void remove() {
-            throw new UnsupportedOperationException();
+            it.remove();
         }
 
     }

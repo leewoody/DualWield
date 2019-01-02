@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
     private static final int REQUEST_CODE_ONBOARDING = 234;
+    private static final int REQUEST_ENABLE_BT = 5346;
 
     private TextView statusText;
     private NotStupidSwitch connectionSwitch;
@@ -64,7 +65,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-
 
         if (new DeviceRepo(this).getPairedDevice() == null) {
             startOnboarding();
@@ -102,11 +102,22 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 finish();
             }
+        } else if (requestCode == REQUEST_ENABLE_BT) {
+            if (resultCode == RESULT_OK) {
+                connect();
+            }
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
     private void connect() {
+        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (!bluetoothAdapter.isEnabled()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+            return;
+        }
+
         startService(new Intent(this, BLEservice.class));
     }
 

@@ -224,7 +224,7 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification 
 				mBluetoothGatt = dev.connectGatt(this, auto, mANCScb, BluetoothDevice.TRANSPORT_LE);
 				mANCScb.setBluetoothGatt(mBluetoothGatt);
 				mANCScb.setStateStart();
-				mBluetoothGatt.connect();
+//				mBluetoothGatt.connect();
 			} catch (Exception e) {
 				Log.e(TAG, "Failed to connect", e);
 				mBleANCS_state = ANCSGattCallback.BleDisconnect;
