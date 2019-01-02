@@ -34,6 +34,8 @@ public class ANCSParser {
 
 	public final static int EventFlagSilent = (1 << 0);
 	public final static int EventFlagImportant = (1 << 1);
+	public final static int EventFlagPreExisting = (1 << 2);
+
 	public final static int EventIDNotificationAdded = 0;
 	public final static int EventIDNotificationModified = 1;
 	public final static int EventIDNotificationRemoved = 2;
@@ -288,10 +290,6 @@ public class ANCSParser {
 					break;
 				}
 				if(EventIDNotificationRemoved ==mCurData.notifyData[0]){
-//					int uid=(mCurData.notifyData[4]&0xff) |
-//							(mCurData.notifyData[5]&0xff<<8)|
-//							(mCurData.notifyData[6]&0xff<<16)|
-//							(mCurData.notifyData[7]&0xff<<24);
 					cancelNotification(mCurData.getUID());
 					mCurData = null;
 					break;
@@ -300,6 +298,12 @@ public class ANCSParser {
 				
 					mCurData = null; // ignore
 					Debug.log(TAG, "ANCS NOT Add!");
+					break;
+				}
+				if (((mCurData.notifyData[1]) & EventFlagPreExisting) != 0) {
+
+					mCurData = null; // ignore
+					Debug.log(TAG, "Skipping existing");
 					break;
 				}
 				// get attribute if needed!
