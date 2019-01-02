@@ -15,6 +15,7 @@ import android.content.Context;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import com.odbol.dualwield.Debug;
 import com.odbol.dualwield.events.ConnectionStatusEvent;
 import com.odbol.dualwield.events.ConnectionStatusEventBus;
 
@@ -60,7 +61,7 @@ public class ANCSGattCallback extends BluetoothGattCallback {
 	}
 
 	private void setState(int state) {
-		Log.d(TAG, "setState " + state);
+		Debug.log(TAG, "setState " + state);
 		mBleState = state;
 		eventBus.send(new ConnectionStatusEvent(state, true));
 	}
@@ -112,17 +113,19 @@ public class ANCSGattCallback extends BluetoothGattCallback {
 		UUID uuid = cha.getUuid();
 		if (uuid.equals(GattConstant.Apple.sUUIDChaNotify)) {
 
-			Log.i(TAG,"Notify uuid");
+			Debug.log(TAG,"Notify uuid");
 			byte[] data = cha.getValue();
 			mANCSHandler.onNotification(data);
-			
-			setState(BleBuildNotify);
-			setState(BleAncsConnected);
+
+			if (mBleState != BleAncsConnected) {
+				setState(BleBuildNotify);
+				setState(BleAncsConnected);
+			}
 		} else if (uuid.equals(GattConstant.Apple.sUUIDDataSource)) {
 
 			byte[] data = cha.getValue();
 			mANCSHandler.onDSNotification(data);
-			Log.i(TAG,"datasource uuid");
+			Debug.log(TAG,"datasource uuid");
 		} else {
 		}
 	}
@@ -131,14 +134,14 @@ public class ANCSGattCallback extends BluetoothGattCallback {
 	public void onConnectionStateChange(BluetoothGatt gatt, int status,
 			int newState) {
 
-		Log.i(TAG,"onConnectionStateChange"+ "newState " + newState + "status:" + status);
+		Debug.log(TAG,"onConnectionStateChange"+ "newState " + newState + "status:" + status);
 		setState(newState);
 		if (newState == BluetoothProfile.STATE_CONNECTED
 				&& status == BluetoothGatt.GATT_SUCCESS) {
-			Log.i(TAG,"start discover service");
+			Debug.log(TAG,"start discover service");
 			setState(BleBuildDiscoverService);
 			mBluetoothGatt.discoverServices();
-			Log.i(TAG,"discovery service end");
+			Debug.log(TAG,"discovery service end");
 			setState(BleBuildDiscoverOver);
 		} else if (0 == newState/* && mDisconnectReq*/ && mBluetoothGatt != null) {
 		}
@@ -147,7 +150,7 @@ public class ANCSGattCallback extends BluetoothGattCallback {
 	@Override	// New services discovered
 	public void onServicesDiscovered(BluetoothGatt gatt, int status) {
 
-		Log.i(TAG,"onServicesDiscovered "+"status:" + status);
+		Debug.log(TAG,"onServicesDiscovered "+"status:" + status);
 		if(status != 0 ) return;
 		BluetoothGattService ancs = gatt.getService(GattConstant.Apple.sUUIDANCService);
 		if (ancs == null) {
@@ -155,7 +158,7 @@ public class ANCSGattCallback extends BluetoothGattCallback {
 			return;
 		}
 
-		Log.i(TAG,"find ANCS service");
+		Debug.log(TAG,"find ANCS service");
 
 		BluetoothGattCharacteristic DScha = ancs.getCharacteristic(GattConstant.Apple.sUUIDDataSource);
 		if (DScha == null) {
@@ -172,7 +175,7 @@ public class ANCSGattCallback extends BluetoothGattCallback {
 			boolean r = descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
 			boolean rr = mBluetoothGatt.writeDescriptor(descriptor);
 
-			Log.i(TAG,"Descriptoer setvalue " + r + "writeDescriptor() " + rr);
+			Debug.log(TAG,"Descriptoer setvalue " + r + "writeDescriptor() " + rr);
 		} else {
 			Log.i(TAG,"can not find descriptor from (DS)");
 		}
@@ -185,14 +188,14 @@ public class ANCSGattCallback extends BluetoothGattCallback {
 		mANCSservice = ancs;
 		mANCSHandler.setService(ancs, mBluetoothGatt);
 		ANCSParser.get().reset();
-		Log.i(TAG,"found ANCS service & set DS character,descriptor OK !");
+		Debug.log(TAG,"found ANCS service & set DS character,descriptor OK !");
 
 	}
 
 	@Override//the result of a descriptor write operation.
 	public void onDescriptorWrite(BluetoothGatt gatt,
 			BluetoothGattDescriptor descriptor, int status) {
-		Log.i(TAG,"onDescriptorWrite"+"status:" + status);
+		Debug.log(TAG,"onDescriptorWrite"+"status:" + status);
 
 		if (15 == status || 5 == status) {
 			setState(BleBuildSetingANCS);//5
@@ -224,7 +227,7 @@ public class ANCSGattCallback extends BluetoothGattCallback {
 				boolean r=desp.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
 				boolean rr = mBluetoothGatt.writeDescriptor(desp);
 				mWriteNS_DespOk = rr;
-				Log.i(TAG,"(NS)Descriptor.setValue(): " + r + ",writeDescriptor(): " + rr);
+				Debug.log(TAG,"(NS)Descriptor.setValue(): " + r + ",writeDescriptor(): " + rr);
 			} else {
 				Log.i(TAG,"null descriptor");
 			}
