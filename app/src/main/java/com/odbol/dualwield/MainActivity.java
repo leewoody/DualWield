@@ -127,15 +127,17 @@ public class MainActivity extends AppCompatActivity {
 
     private void onConnectionStatus(ConnectionStatusEvent event) {
         Log.d(TAG, "onConnectionStatus " + event);
-        int state;
-        state = getStateMessage(event.status);
+        runOnUiThread(() -> {
+            int state;
+            state = getStateMessage(event.status);
 
-        statusText.setText(state);
+            statusText.setText(state);
 
-        connectionSwitch.setCheckedSilently(event.isServiceStarted);
+            connectionSwitch.setCheckedSilently(event.isServiceStarted);
 
-        // TODO(tyler): always show this???
-        rePairButton.setVisibility(event.status != ANCSGattCallback.BleAncsConnected ? View.VISIBLE : View.VISIBLE);
+            // TODO(tyler): always show this???
+            rePairButton.setVisibility(event.status != ANCSGattCallback.BleAncsConnected ? View.VISIBLE : View.VISIBLE);
+        });
     }
 
     public static int getStateMessage(int status) {
