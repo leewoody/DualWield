@@ -124,20 +124,34 @@ public class OnboardingActivity extends AppIntro {
         ));
 
         addSlide(OnboardingSlide.newInstance(
+                getString(R.string.onboarding_desc_2),
                 R.string.onboarding_label_2,
-                R.drawable.logo
+                R.drawable.garageband_qr_code
         ));
 
         addSlide(OnboardingSlide.newInstance(
                 R.string.onboarding_label_3,
-                R.drawable.logo
+                R.drawable.tutorial_1
         ));
         addSlide(OnboardingSlide.newInstance(
                 R.string.onboarding_label_4,
-                R.drawable.logo
+                R.drawable.tutorial_2
+        ));
+        addSlide(OnboardingSlide.newInstance(
+                R.string.onboarding_label_4,
+                R.drawable.tutorial_3
         ));
         addSlide(OnboardingSlide.newInstance(
                 R.string.onboarding_label_5,
+                R.drawable.tutorial_4
+        ));
+        addSlide(OnboardingSlide.newInstance(
+                getString(R.string.onboarding_desc_5),
+                R.string.onboarding_label_5,
+                R.drawable.tutorial_5
+        ));
+        addSlide(OnboardingSlide.newInstance(
+                R.string.onboarding_label_6,
                 R.drawable.logo
         ));
 
@@ -200,9 +214,11 @@ public class OnboardingActivity extends AppIntro {
         Log.d(TAG, "onSlideChanged " + index);
         if (index == 2) {
             startBroadcasting();
-        } else if (index == 4) {
+        } else if (index == getSlides().size() - 2) {
             showSkipButton(false);
             setProgressButtonEnabled(false);
+        } else {
+            setProgressButtonEnabled(true);
         }
     }
 

@@ -25,9 +25,12 @@
     <string name="onboarding_label_1">Permissions for Bluetooth</string>
     <string name="onboarding_desc_1">Location permissions are required to perform Bluetooth scans</string>
     <string name="onboarding_label_2">Install Garageband on your iPhone</string>
-    <string name="onboarding_label_3">Open a song in Garageband</string>
-    <string name="onboarding_label_4">Click Settings-&gt;Advanced-&gt;Bluetooth MIDI Devices and click your Android phone to pair with it</string>
-    <string name="onboarding_label_5">Success! Click Done to start mirroring notifications.</string>
+    <string name="onboarding_desc_2">Point your iPhone camera at this QR Code to download from the App Store.\n\nWe use Garageband for a special BLE pairing process; you may delete it after this setup.</string>
+    <string name="onboarding_label_3">Open a song in Garageband and click the Settings button</string>
+    <string name="onboarding_label_4">Click Advanced-&gt;Bluetooth MIDI Devices</string>
+    <string name="onboarding_label_5">Click your Android phone to pair</string>
+    <string name="onboarding_desc_5">Also accept pairing on your Android: it may be in the notifications shade</string>
+    <string name="onboarding_label_6">Success! Click Done to start mirroring notifications.</string>
     <string name="re_pair">Re-pair</string>
     <string name="enable_mirroring">Enable Notification Mirroring</string>
     <string name="ongoing_notification_message_connecting">Trying to connect…</string>

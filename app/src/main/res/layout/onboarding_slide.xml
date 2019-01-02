@@ -3,6 +3,7 @@
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:padding="16dp"
                 android:background="#fefffe">
 
     <ImageView
@@ -44,9 +45,9 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
         android:gravity="center_horizontal"
-        android:textSize="18sp"
+        android:textSize="16sp"
         android:textColor="@color/secondary_text"
-        tools:text="Enable locations for fun and profit"/>
+        tools:text="Enable locations for fun and profit locations for fun and profitlocations for fun and profit"/>
 
 
 </RelativeLayout>
