@@ -14,6 +14,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import com.odbol.dualwield.Debug;
+
 import org.netbeans.modules.vcscore.util.WeakList;
 
 public class ANCSParser {
@@ -51,7 +53,6 @@ public class ANCSParser {
 
 	public final static int ActionIDPositive = 0;
 	public final static int ActionIDNegative = 1;
-
 
 
 	// !ANCS constants
@@ -95,7 +96,7 @@ public class ANCSParser {
 					}
 					if (System.currentTimeMillis() >= mCurData.timeExpired) {
 		
-						Log.i(TAG,"msg timeout!");
+						Debug.log(TAG, "msg timeout!");
 					}
 				} else if (MSG_ADD_NOTIFICATION == what) {
 					mPendingNotifcations.add(new ANCSData((byte[]) msg.obj));
@@ -110,15 +111,15 @@ public class ANCSParser {
 					mPendingNotifcations.clear();
 					mCurData = null;
 		
-					Log.i(TAG,"ANCSHandler reseted");
+					Debug.log(TAG, "ANCSHandler reseted");
 				} else if (MSG_ERR == what) {
 	
-					Log.i(TAG,"error,skip_cur_data");
+					Debug.log(TAG, "error,skip_cur_data");
 					mCurData.clear();
 					mCurData = null;
 					mHandler.sendEmptyMessage(MSG_DO_NOTIFICATION);
 				} else if (MSG_FINISH == what) {
-					Log.i(TAG,"msg data.finish()");
+					Debug.log(TAG, "msg data.finish()");
 					if(null!=mCurData)
 					mCurData.finish();
 				}
@@ -152,13 +153,13 @@ public class ANCSParser {
 	}
 
 	private void sendNotification(final IOSNotification noti) {
-		Log.i(TAG,"[Add Notification] : "+noti.uid);
+		Debug.log(TAG, "[Add Notification] : "+noti.uid);
 		for(onIOSNotification lis: mListeners){
 			lis.onIOSNotificationAdd(noti);
 		}
 	}
 	private void cancelNotification(int uid){
-		Log.i(TAG,"[cancel Notification] : "+uid);
+		Debug.log(TAG, "[cancel Notification] : "+uid);
 		for(onIOSNotification lis: mListeners){
 			lis.onIOSNotificationRemove(uid);
 		}
@@ -201,19 +202,19 @@ public class ANCSParser {
 			final byte[] data = bout.toByteArray();
 			logD(data);
 			if (data.length < 5) {
-				Log.i(TAG,"data length less than 5: " + data.length);
+				Log.w(TAG,"data length less than 5: " + data.length);
 				return; // 
 			}
 			// check if finished ?
 			int cmdId = data[0]; // should be 0								//0 commandID
 			if (cmdId != 0) {
-				Log.i(TAG,"bad cmdId: " + cmdId);
+				Log.w(TAG,"bad cmdId: " + cmdId);
 				return;
 			}
 			int uid = ((0xff&data[4]) << 24) | ((0xff &data[3]) << 16)			
 					| ((0xff & data[2]) << 8) | ((0xff &data[1]));
 			if (uid != mCurData.getUID()) {
-	
+
 				Log.w(TAG,"bad uid: " + uid + "->" + mCurData.getUID());
 				return;
 			}
@@ -227,7 +228,7 @@ public class ANCSParser {
 					break; 
 				}
 				if (data.length < curIdx + 3) {
-					Log.i(TAG,"data length done: " + data.length);
+					Debug.log(TAG, "data length done: " + data.length);
 					return;
 				}
 				// attributes head
@@ -235,11 +236,11 @@ public class ANCSParser {
 				int attrLen = ((data[curIdx + 1])&0xFF) | (0xFF&(data[curIdx + 2] << 8));
 				curIdx += 3;
 				if (data.length < curIdx + attrLen) {
-					Log.i(TAG,"data length attribute too short: " + data.length + " < " + curIdx + attrLen);
+					Debug.log(TAG, "data length attribute too short: " + data.length + " < " + curIdx + attrLen);
 					return;
 				}
 				String val = new String(data, curIdx, attrLen);//utf-8 encode
-				Log.i(TAG,"got attribute: " + val);
+				Debug.log(TAG, "got attribute: " + val);
 				if (attrId == NotificationAttributeIDTitle) { 
 					noti.title = val;
 				} else if (attrId == NotificationAttributeIDMessage) {
@@ -253,12 +254,12 @@ public class ANCSParser {
 				}
 				curIdx += attrLen;
 			}
-			Log.i(TAG,"noti.title:"+noti.title);
-			Log.i(TAG,"noti.message:"+noti.message);
-			Log.i(TAG,"noti.date:"+noti.date);
-			Log.i(TAG,"noti.subtitle:"+noti.subtitle);
-			Log.i(TAG,"noti.messageSize:"+noti.messageSize);
-			Log.i(TAG,"got a notification! data size = "+data.length);
+			Debug.log(TAG, "noti.title:"+noti.title);
+			Debug.log(TAG, "noti.message:"+noti.message);
+			Debug.log(TAG, "noti.date:"+noti.date);
+			Debug.log(TAG, "noti.subtitle:"+noti.subtitle);
+			Debug.log(TAG, "noti.messageSize:"+noti.messageSize);
+			Debug.log(TAG, "got a notification! data size = "+data.length);
 			mCurData = null;
 			mHandler.sendEmptyMessage(MSG_DO_NOTIFICATION); // continue next!
 			sendNotification(noti);
@@ -275,7 +276,7 @@ public class ANCSParser {
 			}
 
 			mCurData = mPendingNotifcations.remove(0);
-			Log.i(TAG,"ANCS New CurData");
+			Debug.log(TAG, "ANCS New CurData");
 		} else if (mCurData.curStep == 0) { // parse notify data
 	
 			do {
@@ -283,7 +284,7 @@ public class ANCSParser {
 						|| mCurData.notifyData.length != 8) {
 					mCurData = null; // ignore
 			
-					Log.w(TAG,"ANCS Bad Head!");
+					Debug.log(TAG, "ANCS Bad Head!");
 					break;
 				}
 				if(EventIDNotificationRemoved ==mCurData.notifyData[0]){
@@ -298,7 +299,7 @@ public class ANCSParser {
 				if (EventIDNotificationAdded != mCurData.notifyData[0]) {
 				
 					mCurData = null; // ignore
-					Log.i(TAG,"ANCS NOT Add!");
+					Debug.log(TAG, "ANCS NOT Add!");
 					break;
 				}
 				// get attribute if needed!
@@ -341,7 +342,7 @@ public class ANCSParser {
 
 					cha.setValue(data);
 					mGatt.writeCharacteristic(cha);
-					Log.i(TAG,"request ANCS(CP) the data of Notification. = ");
+					Debug.log(TAG, "request ANCS(CP) the data of Notification. = ");
 					mCurData.curStep = 1;	
 					mCurData.bout = new ByteArrayOutputStream();
 					mCurData.timeExpired = System.currentTimeMillis() + TIMEOUT;
@@ -349,7 +350,7 @@ public class ANCSParser {
 //					mHandler.sendEmptyMessageDelayed(MSG_CHECK_TIME, TIMEOUT);
 					return;
 				} else {
-					Log.i(TAG,"ANCS has No Control Point !");
+					Debug.log(TAG, "ANCS has No Control Point !");
 					// has no control!// just vibrate ...
 					mCurData.bout = null;
 					mCurData.curStep = 1;
@@ -370,7 +371,7 @@ public class ANCSParser {
 	public void onDSNotification(byte[] data) {
 		if (mCurData == null) {
 	
-			Log.i(TAG,"got ds notify without cur data");
+			Debug.log(TAG, "got ds notify without cur data");
 			return;
 		}
 		try {
@@ -387,7 +388,7 @@ public class ANCSParser {
 			Log.i(TAG,"write err: " + status);
 			mHandler.sendEmptyMessage(MSG_ERR);
 		} else {
-			Log.i(TAG,"write OK");
+			Debug.log(TAG, "write OK");
 			mHandler.sendEmptyMessage(MSG_DO_NOTIFICATION);
 		}
 	}
@@ -408,7 +409,7 @@ public class ANCSParser {
 	}
 
 	public void clearNotification(int notificationId) {
-		Log.d(TAG, "clearNotification " + notificationId);
+		Debug.log(TAG, "clearNotification " + notificationId);
 		mHandler.post(() ->
 			performNotificationAction(notificationId, ActionIDNegative)
 		);
@@ -434,10 +435,10 @@ public class ANCSParser {
 
 			cha.setValue(data);
 			mGatt.writeCharacteristic(cha);
-			Log.i(TAG,"performNotificationAction.");
+			Debug.log(TAG, "performNotificationAction.");
 			return;
 		} else {
-			Log.w(TAG,"ANCS has No Control Point !");
+			Debug.log(TAG, "ANCS has No Control Point !");
 		}
 	}
 	
@@ -447,7 +448,7 @@ public class ANCSParser {
 		for(int i=0;i<len;i++){
 			sb.append(d[i]+", ");
 		}
-		Log.i(TAG,"log Data size["+len+"] : "+sb);
+		Debug.log(TAG, "log Data size["+len+"] : "+sb);
 	}
-	
+
 }
