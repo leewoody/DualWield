@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == REQUEST_CODE_ONBOARDING) {
             if (resultCode == RESULT_OK) {
-                connect();
+                rePairButton.postDelayed(this::connect, 500);
             } else {
                 finish();
             }
