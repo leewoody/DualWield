@@ -71,21 +71,9 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification 
 	private Handler mHandler = new Handler(){
     	@Override
     	public void handleMessage(Message msg){
-			switch (msg.what) {
-			case 11:	//bt off, stopSelf()
-				stopSelf();
-				startActivityMsg();
-				break;
-			}
+
     	}
     };
-    // when bt off,  show a Message to notify user that ble need re_connect
-    private void startActivityMsg(){
-    	// TODO(tyler): post notification instead.
-    	Intent i = new Intent(this,Notice.class);
-    	i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-    	startActivity(i);
-    }
     
 	@Override
 	public void onCreate() {
@@ -111,7 +99,10 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification 
 						BluetoothAdapter.ERROR);
 				if (state == BluetoothAdapter.STATE_OFF) {
 					Log.i(TAG,"bluetooth OFF !");
-					mHandler.sendEmptyMessageDelayed(11, 500);
+					mHandler.postDelayed(() -> mANCScb.stop(), 500);
+				} else if (state == BluetoothAdapter.STATE_ON) {
+					Log.i(TAG,"bluetooth ON !");
+					mHandler.postDelayed(() -> startBleConnect(addr, mAuto), 500);
 				}
 			}
 		};
