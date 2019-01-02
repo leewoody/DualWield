@@ -12,4 +12,9 @@ public class ConnectionStatusEvent {
         this.status = status;
         this.isServiceStarted = isServiceStarted;
     }
+
+    @Override
+    public String toString() {
+        return "ConnectionStatusEvent status: " + status + " isServiceStarted: " + isServiceStarted;
+    }
 }

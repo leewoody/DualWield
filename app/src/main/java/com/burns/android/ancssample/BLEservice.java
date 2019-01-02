@@ -124,6 +124,7 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification 
 	}
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
+		Log.i(TAG,"onStartCommand() flags="+flags+",stardId="+startId);
 		if (intent != null) {
 			mAuto = intent.getBooleanExtra(BLEservice.EXTRA_IS_AUTO_CONNECT, true);
 			addr = intent.getStringExtra(BLEservice.EXTRA_BT_ADDRESS);
@@ -132,7 +133,6 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification 
 				startBleConnect(addr, mAuto);
 			}
 		}
-		Log.i(TAG,"onStartCommand() flags="+flags+",stardId="+startId);
 		return START_STICKY_COMPATIBILITY;
 		//return startId;
 	}
@@ -145,6 +145,9 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification 
 		deleter.unregister();
 		mANCScb.stop();
 		mANCSHandler.removeListenerIOSNotification(this);
+
+		ConnectionStatusEventBus.getInstance().send(new ConnectionStatusEvent(ANCSGattCallback.BleDisconnect, false));
+
 		unregisterReceiver(mBtOnOffReceiver);
 		Editor e =getSharedPreferences(DevicesActivity.PREFS_NAME, 0).edit();
 		e.putInt(DevicesActivity.BleStateKey, ANCSGattCallback.BleDisconnect);
@@ -230,6 +233,7 @@ public class BLEservice extends Service implements ANCSParser.onIOSNotification 
 				mBluetoothGatt = dev.connectGatt(this, auto, mANCScb, BluetoothDevice.TRANSPORT_LE);
 				mANCScb.setBluetoothGatt(mBluetoothGatt);
 				mANCScb.setStateStart();
+				mBluetoothGatt.connect();
 			} catch (Exception e) {
 				Log.e(TAG, "Failed to connect", e);
 				mBleANCS_state = ANCSGattCallback.BleDisconnect;

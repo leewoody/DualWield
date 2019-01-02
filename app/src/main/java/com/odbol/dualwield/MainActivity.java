@@ -1,36 +1,37 @@
 package com.odbol.dualwield;
 
 import android.Manifest;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.burns.android.ancssample.ANCSGattCallback;
 import com.burns.android.ancssample.BLEservice;
 import com.burns.android.ancssample.R;
+import com.odbol.NotStupidSwitch;
 import com.odbol.dualwield.events.ConnectionStatusEvent;
 import com.odbol.dualwield.events.ConnectionStatusEventBus;
 import com.odbol.dualwield.onboarding.DeviceRepo;
 import com.odbol.dualwield.onboarding.OnboardingActivity;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
-import org.netbeans.modules.vcscore.util.WeakList;
-
 import io.reactivex.disposables.CompositeDisposable;
 
 public class MainActivity extends AppCompatActivity {
+    private static final String TAG = "MainActivity";
 
     private static final int REQUEST_CODE_ONBOARDING = 234;
 
     private TextView statusText;
-    private Switch connectionSwitch;
+    private NotStupidSwitch connectionSwitch;
     private Button rePairButton;
 
     private final CompositeDisposable subscriptions = new CompositeDisposable();
@@ -114,12 +115,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void onConnectionStatus(ConnectionStatusEvent event) {
+        Log.d(TAG, "onConnectionStatus " + event);
         int state;
         state = getStateMessage(event.status);
 
         statusText.setText(state);
 
-        connectionSwitch.setChecked(!event.isServiceStarted);
+        connectionSwitch.setCheckedSilently(event.isServiceStarted);
 
         // TODO(tyler): always show this???
         rePairButton.setVisibility(event.status != ANCSGattCallback.BleAncsConnected ? View.VISIBLE : View.VISIBLE);

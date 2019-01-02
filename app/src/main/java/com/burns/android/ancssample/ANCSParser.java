@@ -14,6 +14,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import org.netbeans.modules.vcscore.util.WeakList;
+
 public class ANCSParser {
 	// ANCS constants
 	public final static int NotificationAttributeIDAppIdentifier = 0;
@@ -74,7 +76,7 @@ public class ANCSParser {
 	Context mContext;
 	private static ANCSParser sInst;
 	
-	private ArrayList<onIOSNotification> mListeners=new ArrayList<onIOSNotification>();
+	private List<onIOSNotification> mListeners = new WeakList<>();
 
 	public interface onIOSNotification{
 		void onIOSNotificationAdd(IOSNotification n);
