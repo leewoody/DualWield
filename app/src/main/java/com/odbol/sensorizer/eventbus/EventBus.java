@@ -19,12 +19,11 @@ import io.reactivex.subjects.Subject;
  */
 public class EventBus<T> {
 
-    // need two lines cause java can't figure out the type of pb if you slap it in _bus's constructor.
     private final Subject<T> _bus;
 
     protected EventBus(boolean cacheLastValue) {
         if (cacheLastValue) {
-            ReplaySubject<T> pb = ReplaySubject.create(1);
+            ReplaySubject<T> pb = ReplaySubject.createWithSize(1);
 
             _bus = pb.toSerialized();
         }
